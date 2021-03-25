@@ -1,8 +1,9 @@
 public enum ElementType
 {
-    Ground,
-    Box,
-    Player,
-    Target,
-    Air
+    Ground,         // empty ground
+    Box,            // moveable box
+    Player,         // player
+    Target,         // place where box should be placed
+    Air,            // empty space
+    DoneTarget      // target with box on it
 }

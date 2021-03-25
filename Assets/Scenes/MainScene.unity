@@ -342,6 +342,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bddc4576147d56449bb4ad8745989d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveSpeed: 15
   playerElement: {fileID: 1743900402929335938, guid: ef5328b16ba8bae41880747f19ce7fd1, type: 3}
   targetElement: {fileID: 3921116058233877194, guid: 86310dace8b1080418790d3d6f9f5275, type: 3}
   groundElement: {fileID: 4234973135102999844, guid: ea040cbcfd4516f44a5853bd5217d4ca, type: 3}
