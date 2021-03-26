@@ -7,6 +7,8 @@ public class Map
 {
     public Vector2Int mapSize;
     public ElementType[,] mapDefinition;
+    public Biomes biomeType;
+    public LevelOfDifficulty levelOfDifficulty;
 
     /// <summary>
     /// Checks whether the map is defined and playable.
