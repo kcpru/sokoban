@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<SokobanLevel difficulty="Easy" biome="Grass">
+  <LevelStructure width="12" height="12">
+    <Row>GGGGGGGGGGGG</Row>
+    <Row>GGGPGGGGGGGG</Row>
+    <Row>GGGGGGGGGGGG</Row>
+    <Row>GGGGGGGGGGGG</Row>
+    <Row>GGGGGGGGGGGG</Row>
+    <Row>GGGGGGGGGGGG</Row>
+    <Row>GGGGGGGGGGGG</Row>
+    <Row>GGGGGGGGGGGG</Row>
+    <Row>GGGGGGGGGGGG</Row>
+    <Row>GGGGGGGGGGGG</Row>
+    <Row>GGGGGBGGGGTG</Row>
+    <Row>GGGGGGGGGGGG</Row>
+  </LevelStructure>
+</SokobanLevel>

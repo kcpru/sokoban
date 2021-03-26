@@ -51,14 +51,14 @@ public class FilesConverterExtension : EditorWindow
         difficulty = (Difficulty)EditorGUILayout.EnumPopup(difficulty);
         EditorGUILayout.EndHorizontal();
 
-        if (!File.Exists(Path.Combine(Application.dataPath, "Maps", normalizedFileName)) || string.IsNullOrEmpty(levelId) 
+        if (!File.Exists(Path.Combine(Application.dataPath, "Resources/Maps", normalizedFileName)) || string.IsNullOrEmpty(levelId) 
             || string.IsNullOrEmpty(newFileName))
             GUI.enabled = false;
 
         if (GUILayout.Button("Convert"))
         {
-            MapSerializer serializer = new MapSerializer(Path.Combine(Application.dataPath, "Maps", newFileName));
-            serializer.ConvertNormalizedFile(Path.Combine(Application.dataPath, "Maps", normalizedFileName), levelId, biomeType, difficulty);
+            MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/" + newFileName);
+            serializer.ConvertNormalizedFile(MapSerializer.MapsPath + "/" + normalizedFileName, levelId, biomeType, difficulty);
         }
 
         GUI.enabled = false;

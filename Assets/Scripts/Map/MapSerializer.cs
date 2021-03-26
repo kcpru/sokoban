@@ -17,6 +17,8 @@ public class MapSerializer
     /// </summary>
     public MapSerializer(string path) => Path = path;
 
+    public static string MapsPath => System.IO.Path.Combine(Application.dataPath, "Resources/Maps");
+
     /// <summary>
     /// Returns <seealso cref="Map"/> deserialized from previously given path.
     /// </summary>

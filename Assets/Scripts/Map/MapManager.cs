@@ -67,8 +67,8 @@ public class MapManager : MonoBehaviour
 
     private void Start()
     {
-        MapSerializer serializer = new MapSerializer(System.IO.Path.Combine(Application.dataPath, "Maps/Level.xml"));
-        Map deserializedMap = serializer.Deserialize();
+        //MapSerializer serializer = new MapSerializer(System.IO.Path.Combine(Application.dataPath, "Maps/Level.xml"));
+        //Map deserializedMap = serializer.Deserialize();
 
         ElementType[,] arr = new ElementType[8, 8]
         {
@@ -87,19 +87,8 @@ public class MapManager : MonoBehaviour
         //if (map.IsMapDefined)
         //    CreateMap(map);
 
-        if (deserializedMap.IsMapDefined)
-            CreateMap(deserializedMap);
-
-        OnPlayerMove += MapManager_OnPlayerMove;
-    }
-
-    private void MapManager_OnPlayerMove(Vector2Int obj)
-    {
-        if (currentMap.IsAllGoalsDone)
-        {
-            print("<color=green>WIN</color>");
-            ClearMap();
-        }
+        //if (deserializedMap.IsMapDefined)
+        //    CreateMap(deserializedMap);
     }
 
     /// <summary>
@@ -120,10 +109,6 @@ public class MapManager : MonoBehaviour
         currentMap = mapToLoad;
         currentElements = new GameObject[currentMap.mapSize.y, currentMap.mapSize.x];
         Vector3 pos = new Vector3(0, 0, 0);
-
-        Vector3 camPos =
-            new Vector3((currentMap.mapSize.x / 2f) - 0.65f, GameManager.camera.transform.position.y, GameManager.camera.transform.position.z);
-        GameManager.camera.SmoothlyChangePosition(camPos, 5f);
 
         for (int y = 0; y < currentMap.mapSize.y; y++)
         {
