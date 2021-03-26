@@ -7,8 +7,8 @@ public class Map
 {
     public Vector2Int mapSize;
     public ElementType[,] mapDefinition;
-    public Biomes biomeType;
-    public LevelOfDifficulty levelOfDifficulty;
+    public Biomes biomeType = Biomes.Grass;
+    public Difficulty difficulty = Difficulty.Easy;
 
     /// <summary>
     /// Checks whether the map is defined and playable.
@@ -61,6 +61,33 @@ public class Map
         }
 
         mapDefinition = map;
+    }
+
+    /// <summary>
+    /// Creates new map which contains given elements.
+    /// </summary>
+    /// <param name="map">Elements</param>
+    /// <param name="biomeType">Type of biome</param>
+    /// <param name="difficulty">Level of difficulty</param>
+    public Map(ElementType[,] map, Biomes biomeType, Difficulty difficulty)
+    {
+        mapSize = new Vector2Int(map.GetLength(1), map.GetLength(0));
+
+        if (!IsOnePlayer(ref map))
+        {
+            Debug.LogError("Map has to contain only one player element!");
+            return;
+        }
+
+        if (!ValidateBoxes(ref map))
+        {
+            Debug.LogError("Count of boxes has to equal count of targets!");
+            return;
+        }
+
+        mapDefinition = map;
+        this.difficulty = difficulty;
+        this.biomeType = biomeType;
     }
 
     /// <summary>

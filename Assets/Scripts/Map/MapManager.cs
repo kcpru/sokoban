@@ -67,15 +67,8 @@ public class MapManager : MonoBehaviour
 
     private void Start()
     {
-        //ElementType[,] arr = new ElementType[6, 7]
-        //{
-        //   { ElementType.Ground, ElementType.Player, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Target },
-        //   { ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground },
-        //   { ElementType.Ground, ElementType.Box, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground },
-        //   { ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground },
-        //   { ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Box, ElementType.Ground, ElementType.Target, ElementType.Ground },
-        //   { ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground }
-        //};
+        MapSerializer serializer = new MapSerializer(System.IO.Path.Combine(Application.dataPath, "Maps/Level.xml"));
+        Map deserializedMap = serializer.Deserialize();
 
         ElementType[,] arr = new ElementType[8, 8]
         {
@@ -91,8 +84,11 @@ public class MapManager : MonoBehaviour
 
         Map map = new Map(arr);
 
-        if (map.IsMapDefined)
-            CreateMap(map);
+        //if (map.IsMapDefined)
+        //    CreateMap(map);
+
+        if (deserializedMap.IsMapDefined)
+            CreateMap(deserializedMap);
 
         OnPlayerMove += MapManager_OnPlayerMove;
     }
@@ -120,9 +116,14 @@ public class MapManager : MonoBehaviour
     private IEnumerator CreateMapCoroutine(Map mapToLoad)
     {
         yield return new WaitForSeconds(1f);
+
         currentMap = mapToLoad;
         currentElements = new GameObject[currentMap.mapSize.y, currentMap.mapSize.x];
         Vector3 pos = new Vector3(0, 0, 0);
+
+        Vector3 camPos =
+            new Vector3((currentMap.mapSize.x / 2f) - 0.65f, GameManager.camera.transform.position.y, GameManager.camera.transform.position.z);
+        GameManager.camera.SmoothlyChangePosition(camPos, 5f);
 
         for (int y = 0; y < currentMap.mapSize.y; y++)
         {
@@ -151,7 +152,7 @@ public class MapManager : MonoBehaviour
 
                     if(elementType == ElementType.DoneTarget || elementType == ElementType.PlayerOnTarget)
                     {
-                        newElem = Instantiate(targetElement, new Vector3(pos.x, 0.1f, -y), Quaternion.identity, MapRoot);
+                        newElem = Instantiate(targetElement, new Vector3(pos.x, 0f, -y), Quaternion.identity, MapRoot);
                         StartCoroutine(NewElementAnimation(newElem.transform));
                         allCreatedElements.Add(newElem);
                     }
@@ -171,7 +172,7 @@ public class MapManager : MonoBehaviour
 
                 pos += new Vector3(1, 0, 0);
 
-                if (!skipCreateAnimation)
+                if (!skipCreateAnimation && elementToSpawn != null)
                     yield return new WaitForSeconds(createElementDelay);
             }
             pos = new Vector3(0, 0, -pos.z);
@@ -285,7 +286,7 @@ public class MapManager : MonoBehaviour
                 currentElements[oldPlayerPos.y, oldPlayerPos.x] = null;
                 currentElements[newPos.y, newPos.x] = Player;
                 currentElements[newBoxPos.y, newBoxPos.x] = box;
-                PrintArrays();
+
                 if (OnPlayerMove != null) OnPlayerMove.Invoke(newPos);
                 return true;
             }

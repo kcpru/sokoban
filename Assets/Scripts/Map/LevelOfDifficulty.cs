@@ -1,4 +1,4 @@
-﻿public enum LevelOfDifficulty
+﻿public enum Difficulty
 {
     Easy, 
     Medium,

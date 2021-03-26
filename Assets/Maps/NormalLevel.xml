@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<SokobanLevels xsi:schemaLocation=""
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Title>BK Levels 1</Title>
+  <Description>
+    An example file to show the layout.
+  </Description>
+  <Email>bk@home.com</Email>
+  <Url>http://www.bk.com</Url>
+  <LevelCollection Copyright="BK" MaxWidth="15" MaxHeight="8">
+    <Level Id="Example 1" Width="15" Height="8">
+      <L>    #####</L>
+      <L>    #   #</L>
+      <L>  ###  $##</L>
+      <L>  #  $ $ #</L>
+      <L>### #  # ######</L>
+      <L># @  $    ....#</L>
+      <L>#####   #######</L>
+      <L>    #####</L>
+    </Level>
+  </LevelCollection>
+</SokobanLevels>
