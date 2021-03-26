@@ -9,6 +9,36 @@ public class Map
     public ElementType[,] mapDefinition;
 
     /// <summary>
+    /// Checks whether the map is defined and playable.
+    /// </summary>
+    public bool IsMapDefined => mapDefinition != null;
+
+    /// <summary>
+    /// Returns true if all goals are done, means they have boxes on themselves.
+    /// </summary>
+    public bool IsAllGoalsDone
+    {
+        get
+        {
+            int boxesCount = 0;
+
+            for (int i = 0; i < mapDefinition.GetLength(0); i++)
+            {
+                for (int j = 0; j < mapDefinition.GetLength(1); j++)
+                {
+                    if (mapDefinition[i, j] == ElementType.Box)
+                        boxesCount++;
+                }
+            }
+
+            if (boxesCount == 0)
+                return true;
+            else
+                return false;
+        }
+    }
+
+    /// <summary>
     /// Creates new map which contains given elements.
     /// </summary>
     /// <param name="map">Elements</param>
@@ -43,10 +73,10 @@ public class Map
         {
             for (int j = 0; j < map.GetLength(1); j++)
             {
-                if (hasPlayer && map[i, j] == ElementType.Player)
+                if (hasPlayer && (map[i, j] == ElementType.Player || map[i, j] == ElementType.PlayerOnTarget))
                     return false;
 
-                if (!hasPlayer && map[i, j] == ElementType.Player)
+                if (!hasPlayer && (map[i, j] == ElementType.Player || map[i, j] == ElementType.PlayerOnTarget))
                     hasPlayer = true;
             }
         }
@@ -68,7 +98,7 @@ public class Map
                 if (map[i, j] == ElementType.Box)
                     boxesCount++;
 
-                if (map[i, j] == ElementType.Target)
+                if (map[i, j] == ElementType.Target || map[i, j] == ElementType.PlayerOnTarget)
                     targetsCount++;
             }
         }

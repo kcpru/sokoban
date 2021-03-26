@@ -5,5 +5,6 @@ public enum ElementType
     Player,         // player
     Target,         // place where box should be placed
     Air,            // empty space
-    DoneTarget      // target with box on it
+    DoneTarget,     // target with box on it
+    PlayerOnTarget  // player is on target
 }

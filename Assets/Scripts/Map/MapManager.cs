@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System;
 
 /// <summary>
 /// Class that allows to create a map and provides methods to operate on it.
@@ -7,7 +9,7 @@ using System.Collections;
 public class MapManager : MonoBehaviour
 {
     [Header("Movement settings")]
-    [SerializeField] private float moveSpeed = 10f;
+    [SerializeField] private float moveSpeed = 7f;
 
     [Header("Map elements")]
     [SerializeField] private GameObject playerElement;
@@ -15,12 +17,21 @@ public class MapManager : MonoBehaviour
     [SerializeField] private GameObject groundElement;
     [SerializeField] private GameObject boxElement;
 
+    [Header("Map creation settings")]
+    [SerializeField] private bool skipCreateAnimation = false;
+    [SerializeField] private float createElementDelay = 0.1f;
+    [SerializeField] private float destroyElementDelay = 0.05f;
+    [SerializeField] private float createAnimationScale = 1.2f;
+    [SerializeField] private float createAnimationUpScaleSpeed = 8f;
+    [SerializeField] private float createAnimationDownScaleSpeed = 5f;
+
     /// <summary>
     /// Currently load map.
     /// </summary>
     public Map currentMap;
 
     public GameObject[,] currentElements;
+    [HideInInspector] public List<GameObject> allCreatedElements = new List<GameObject>();
     public GameObject Player { get; private set; }
 
     public Vector2Int PlayerPosition
@@ -31,7 +42,7 @@ public class MapManager : MonoBehaviour
             {
                 for (int x = 0; x < currentMap.mapSize.x; x++)
                 {
-                    if (currentMap.mapDefinition[y, x] == ElementType.Player)
+                    if (currentMap.mapDefinition[y, x] == ElementType.Player || currentMap.mapDefinition[y, x] == ElementType.PlayerOnTarget)
                         return new Vector2Int(x, y);
                 }
             }
@@ -40,49 +51,80 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    private Transform MapRoot => transform;
     private const float X_OFFSET = 1f;
     private const float Y_OFFSET = 1f;
 
     public static MapManager CurrentMapManager { get; private set; }
+    public bool CanMove { get; private set; } = false;
+    public Transform MapRoot => transform;
+
+    /// <summary>
+    /// Raises when player moves.
+    /// </summary>
+    public event Action<Vector2Int> OnPlayerMove;
 
     private void Awake() => CurrentMapManager = this;
 
     private void Start()
     {
-        //ElementType[,] arr = new ElementType[4, 4]
+        //ElementType[,] arr = new ElementType[6, 7]
         //{
-        //   { ElementType.Player, ElementType.Ground, ElementType.Ground, ElementType.Ground },
-        //   { ElementType.Ground, ElementType.Ground, ElementType.Box, ElementType.Ground },
-        //   { ElementType.Ground, ElementType.Air, ElementType.Air, ElementType.Ground },
-        //   { ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Target }
+        //   { ElementType.Ground, ElementType.Player, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Target },
+        //   { ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground },
+        //   { ElementType.Ground, ElementType.Box, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground },
+        //   { ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground },
+        //   { ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Box, ElementType.Ground, ElementType.Target, ElementType.Ground },
+        //   { ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground }
         //};
 
-        ElementType[,] arr = new ElementType[6, 7]
+        ElementType[,] arr = new ElementType[8, 8]
         {
-           { ElementType.Ground, ElementType.Player, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Target },
-           { ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground },
-           { ElementType.Ground, ElementType.Box, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground },
-           { ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground },
-           { ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Box, ElementType.Ground, ElementType.Target, ElementType.Ground },
-           { ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground }
+            { ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Box, ElementType.Ground, ElementType.Target, ElementType.Air, ElementType.Air},
+            { ElementType.Ground, ElementType.PlayerOnTarget, ElementType.Ground, ElementType.Box, ElementType.Air, ElementType.Ground,ElementType.Ground, ElementType.Ground},
+            { ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground,ElementType.Ground, ElementType.Ground},
+            { ElementType.Ground, ElementType.Ground, ElementType.Air, ElementType.Air, ElementType.Air, ElementType.Ground,ElementType.DoneTarget, ElementType.Ground},
+            { ElementType.Ground, ElementType.Ground, ElementType.Air, ElementType.Air, ElementType.Ground, ElementType.Ground,ElementType.Ground, ElementType.Ground},
+            { ElementType.Air, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground,ElementType.Ground, ElementType.Ground},
+            { ElementType.Air, ElementType.Ground, ElementType.Box, ElementType.Air, ElementType.Ground, ElementType.Box, ElementType.Air, ElementType.Target},
+            { ElementType.Air, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground,ElementType.Ground, ElementType.Target}
         };
 
         Map map = new Map(arr);
-        CreateMap(map);
+
+        if (map.IsMapDefined)
+            CreateMap(map);
+
+        OnPlayerMove += MapManager_OnPlayerMove;
+    }
+
+    private void MapManager_OnPlayerMove(Vector2Int obj)
+    {
+        if (currentMap.IsAllGoalsDone)
+        {
+            print("<color=green>WIN</color>");
+            ClearMap();
+        }
     }
 
     /// <summary>
     /// Instantiates map elements according to given <seealso cref="Map"/>.
     /// </summary>
     /// <param name="mapToLoad"></param>
-    public void CreateMap(Map mapToLoad)
+    public void CreateMap(Map mapToLoad) => StartCoroutine(CreateMapCoroutine(mapToLoad));
+
+    /// <summary>
+    /// Clears currently spawned map.
+    /// </summary>
+    public void ClearMap() => StartCoroutine(ClearMapCoroutine());
+
+    private IEnumerator CreateMapCoroutine(Map mapToLoad)
     {
+        yield return new WaitForSeconds(1f);
         currentMap = mapToLoad;
         currentElements = new GameObject[currentMap.mapSize.y, currentMap.mapSize.x];
         Vector3 pos = new Vector3(0, 0, 0);
 
-        for(int y = 0; y < currentMap.mapSize.y; y++)
+        for (int y = 0; y < currentMap.mapSize.y; y++)
         {
             for (int x = 0; x < currentMap.mapSize.x; x++)
             {
@@ -93,35 +135,103 @@ public class MapManager : MonoBehaviour
                 {
                     float yPos = 1f;
 
-                    if (elementType == ElementType.Ground)
+                    if (elementType == ElementType.Ground || elementType == ElementType.Target)
                     {
                         yPos = 0f;
                     }
-                    else if (elementType == ElementType.Target)
+
+                    GameObject newElem = null;
+
+                    if (elementType != ElementType.Ground && elementType != ElementType.Air && elementType != ElementType.Target)
                     {
-                        yPos = 0.1f;
+                        newElem = Instantiate(groundElement, new Vector3(pos.x, 0f, -y), Quaternion.identity, MapRoot);
+                        StartCoroutine(NewElementAnimation(newElem.transform));
+                        allCreatedElements.Add(newElem);
                     }
 
-                    if (elementType != ElementType.Ground && elementType != ElementType.Air)
+                    if(elementType == ElementType.DoneTarget || elementType == ElementType.PlayerOnTarget)
                     {
-                        Instantiate(groundElement, new Vector3(pos.x, 0f, y), Quaternion.identity, MapRoot);
+                        newElem = Instantiate(targetElement, new Vector3(pos.x, 0.1f, -y), Quaternion.identity, MapRoot);
+                        StartCoroutine(NewElementAnimation(newElem.transform));
+                        allCreatedElements.Add(newElem);
                     }
 
-                    GameObject newElem = Instantiate(elementToSpawn, new Vector3(pos.x, yPos, y), Quaternion.identity, MapRoot);
+                    newElem = Instantiate(elementToSpawn, new Vector3(pos.x, yPos, -y), Quaternion.identity, MapRoot);
+                    allCreatedElements.Add(newElem);
+                    StartCoroutine(NewElementAnimation(newElem.transform));
 
                     if (elementType != ElementType.Ground && elementType != ElementType.Air)
                         currentElements[y, x] = newElem;
                     else
                         currentElements[y, x] = null;
 
-                    if (elementType == ElementType.Player)
+                    if (elementType == ElementType.Player || elementType == ElementType.PlayerOnTarget)
                         Player = currentElements[y, x];
                 }
 
                 pos += new Vector3(1, 0, 0);
+
+                if (!skipCreateAnimation)
+                    yield return new WaitForSeconds(createElementDelay);
             }
-            pos = new Vector3(0, 0, pos.z);
+            pos = new Vector3(0, 0, -pos.z);
         }
+
+        if (!skipCreateAnimation)
+            yield return new WaitForSeconds(1f);
+
+        CanMove = true;
+    }
+
+    private IEnumerator ClearMapCoroutine()
+    {
+        CanMove = false;
+        yield return new WaitForSeconds(1f);
+
+        for (int i = 0; i < allCreatedElements.Count; i++)
+        {
+            StartCoroutine(ClearElementAnimation(allCreatedElements[i].transform));
+            yield return new WaitForSeconds(destroyElementDelay);
+        }
+
+        allCreatedElements.Clear();
+        currentMap = null;
+        currentElements = null;
+    }
+
+    private IEnumerator NewElementAnimation(Transform obj)
+    {
+        if (!skipCreateAnimation)
+        {
+            Vector3 finalScale = obj.localScale;
+            obj.localScale = Vector3.zero;
+            float t = 0f;
+
+            while (obj.localScale.x < finalScale.x)
+            {
+                t += Time.deltaTime * createAnimationUpScaleSpeed;
+                Vector3 scale = Vector3.Lerp(obj.localScale, Vector3.one * createAnimationScale, Time.deltaTime * createAnimationUpScaleSpeed);
+                obj.localScale = scale;
+                yield return null;
+            }
+
+            obj.localScale = finalScale;
+        }
+    }
+
+    private IEnumerator ClearElementAnimation(Transform obj)
+    {
+        float t = 0f;
+
+        while (obj.localScale.x > 0.025f)
+        {
+            t += Time.deltaTime * createAnimationDownScaleSpeed;
+            Vector3 scale = Vector3.Lerp(obj.localScale, Vector3.zero, Time.deltaTime * createAnimationDownScaleSpeed);
+            obj.localScale = scale;
+            yield return null;
+        }
+
+        Destroy(obj.gameObject);
     }
 
     /// <summary>
@@ -129,6 +239,8 @@ public class MapManager : MonoBehaviour
     /// </summary>
     public bool MovePlayer(Vector2Int newPos, Vector2Int dir)
     {
+        if (!CanMove) return false;
+
         Vector2Int oldPlayerPos = PlayerPosition;
 
         if (newPos.x >= currentMap.mapSize.x || newPos.y >= currentMap.mapSize.y || newPos.x < 0 || newPos.y < 0)
@@ -148,11 +260,8 @@ public class MapManager : MonoBehaviour
                 print($"new pos = {newPos}");
                 print($"new box pos = {newBoxPos}");
 
-                Player.transform.position = new Vector3(newPos.x, 1f, newPos.y);
-                currentElements[newPos.y, newPos.x].transform.position = new Vector3(newBoxPos.x, 1f, newBoxPos.y);
-
-                //StartCoroutine(SmoothMoveElement(Player.transform, new Vector3(newPos.x, 1f, newPos.y)));
-                //StartCoroutine(SmoothMoveElement(currentElements[newPos.y, newPos.x].transform, new Vector3(newBoxPos.x, 1f, newBoxPos.y)));
+                StartCoroutine(SmoothMoveElement(Player.transform, new Vector3(newPos.x, 1f, -newPos.y)));
+                StartCoroutine(SmoothMoveElement(currentElements[newPos.y, newPos.x].transform, new Vector3(newBoxPos.x, 1f, -newBoxPos.y)));
 
                 if (GetElementType(newBoxPos) == ElementType.Target)
                 {
@@ -164,16 +273,20 @@ public class MapManager : MonoBehaviour
                     Debug.Log("<color=red>EXIT TARGET</color>");
                 }
 
-                currentMap.mapDefinition[oldPlayerPos.y, oldPlayerPos.x] = ElementType.Ground;
-                currentMap.mapDefinition[newPos.y, newPos.x] = ElementType.Player;
-                currentMap.mapDefinition[newBoxPos.y, newBoxPos.x] =
-                    currentMap.mapDefinition[newBoxPos.y, newBoxPos.x] == ElementType.Target ? ElementType.DoneTarget : ElementType.Box;
+                currentMap.mapDefinition[oldPlayerPos.y, oldPlayerPos.x] = 
+                    GetElementType(oldPlayerPos) == ElementType.PlayerOnTarget ? ElementType.Target : ElementType.Ground;
+
+                currentMap.mapDefinition[newPos.y, newPos.x] = 
+                    GetElementType(newPos) == ElementType.DoneTarget ? ElementType.PlayerOnTarget : ElementType.Player;
+
+                currentMap.mapDefinition[newBoxPos.y, newBoxPos.x] = 
+                    GetElementType(newBoxPos) == ElementType.Target ? ElementType.DoneTarget : ElementType.Box;
 
                 currentElements[oldPlayerPos.y, oldPlayerPos.x] = null;
                 currentElements[newPos.y, newPos.x] = Player;
                 currentElements[newBoxPos.y, newBoxPos.x] = box;
-                print("move pb");
                 PrintArrays();
+                if (OnPlayerMove != null) OnPlayerMove.Invoke(newPos);
                 return true;
             }
             else
@@ -185,17 +298,16 @@ public class MapManager : MonoBehaviour
         print($"old player pos = {oldPlayerPos}");
         print($"new pos = {newPos}");
 
-        Player.transform.position = new Vector3(newPos.x, 1f, newPos.y);
-        //StartCoroutine(SmoothMoveElement(Player.transform, new Vector3(newPos.x, 1f, newPos.y)));
+        StartCoroutine(SmoothMoveElement(Player.transform, new Vector3(newPos.x, 1f, -newPos.y)));
 
-        currentMap.mapDefinition[oldPlayerPos.y, oldPlayerPos.x] = ElementType.Ground;
-        currentMap.mapDefinition[newPos.y, newPos.x] = ElementType.Player;
+        currentMap.mapDefinition[oldPlayerPos.y, oldPlayerPos.x] = 
+            GetElementType(oldPlayerPos) == ElementType.PlayerOnTarget ? ElementType.Target : ElementType.Ground;
+        currentMap.mapDefinition[newPos.y, newPos.x] = GetElementType(newPos) == ElementType.Target ? ElementType.PlayerOnTarget : ElementType.Player;
 
         currentElements[oldPlayerPos.y, oldPlayerPos.x] = null;
         currentElements[newPos.y, newPos.x] = Player;
-        print("move p");
-        PrintArrays();
 
+        if (OnPlayerMove != null) OnPlayerMove.Invoke(newPos);
         return true;
     }
 
@@ -231,14 +343,19 @@ public class MapManager : MonoBehaviour
     /// </summary>
     private IEnumerator SmoothMoveElement(Transform element, Vector3 newPos)
     {
+        CanMove = false;
+
         while (element.position != newPos) 
         {
-            Vector3 pos = Vector3.Lerp(element.transform.position, newPos, Time.deltaTime * moveSpeed);
+            Vector3 pos = Vector3.MoveTowards(element.transform.position, newPos, Time.deltaTime * moveSpeed);
             element.transform.position = pos;
             yield return null;
         }
 
         element.position = new Vector3(Mathf.RoundToInt(element.position.x), element.position.y, Mathf.RoundToInt(element.position.z));
+
+        if (!currentMap.IsAllGoalsDone)
+            CanMove = true;
     }
 
     /// <summary>
@@ -272,12 +389,14 @@ public class MapManager : MonoBehaviour
                 element = groundElement;
                 break;
             case ElementType.Player:
+            case ElementType.PlayerOnTarget:
                 element = playerElement;
                 break;
             case ElementType.Air:
                 element = null;
                 break;
             case ElementType.Box:
+            case ElementType.DoneTarget:
                 element = boxElement;
                 break;
             case ElementType.Target:
