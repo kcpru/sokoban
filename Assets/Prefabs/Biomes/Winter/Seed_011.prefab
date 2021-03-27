@@ -295,7 +295,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5002500755755105648}
   m_Layer: 0
-  m_Name: Seed_0011
+  m_Name: Seed_011
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -386,7 +386,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 0d23457ac728d3046a87afa5fa88e738, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 10c7538f5894d33449079e08fb1c0ff6, type: 2}
+      objectReference: {fileID: 2100000, guid: 9aff2df0c962dfe4eaaadd02105a09d7, type: 2}
     - target: {fileID: 919132149155446097, guid: 0d23457ac728d3046a87afa5fa88e738, type: 3}
       propertyPath: m_Name
       value: Tree_Winter_011
@@ -452,7 +452,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: bef89fb7730410341825a511bf194b66, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 10c7538f5894d33449079e08fb1c0ff6, type: 2}
+      objectReference: {fileID: 2100000, guid: 9aff2df0c962dfe4eaaadd02105a09d7, type: 2}
     - target: {fileID: 919132149155446097, guid: bef89fb7730410341825a511bf194b66, type: 3}
       propertyPath: m_Name
       value: Bush_winter_008

@@ -3,7 +3,12 @@ guid: aa766b93dd4b40349816a48672f7e6c9
 ModelImporter:
   serializedVersion: 20200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: TD_Checker
+    second: {fileID: 2100000, guid: 6968cbbed920a4345a4db14e9e134b01, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
