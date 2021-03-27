@@ -3,7 +3,7 @@ using UnityEngine.Events;
 
 public class Button3D : MonoBehaviour
 {
-    public UnityEvent OnClick = new UnityEvent();
+    public UnityEvent<MonoBehaviour> OnClick = new UnityEvent<MonoBehaviour>();
 
     private bool isMouseOver = false;
     private bool click = false;
@@ -23,7 +23,7 @@ public class Button3D : MonoBehaviour
     {
         if(click && isMouseOver)
         {
-            OnClick.Invoke();
+            OnClick.Invoke(this);
         }
     }
 }

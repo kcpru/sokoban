@@ -10,6 +10,8 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private GameObject module2;
     [SerializeField] private GameObject module3;
     [SerializeField] private GameObject credits;
+    [SerializeField] private GameObject module2Levels;
+    [SerializeField] private GameObject module2Info;
 
     [Header("Module 2")]
     [SerializeField] private GameObject module2MapButton;
@@ -19,14 +21,19 @@ public class MainMenu : MonoBehaviour
     public const int BOTTOM_1 = 1;
     public const int LEVEL = 2;
     public const int EDITOR = 3;
+    public const int PAUSE = 4;
+
+    public static int ModuleNumber { get; private set; } = 0;
 
     private Transform camTrans;
+    private string currentLevelModule2;
 
     private IEnumerator spawnModule2ButtonsCor;
 
     private void Start()
     {
         camTrans = camAnim.transform;
+        camAnim.transform.GetChild(0).GetComponent<Camera>().enabled = true;
     }
 
     public void OpenPage(int view)
@@ -69,6 +76,7 @@ public class MainMenu : MonoBehaviour
                 module2.SetActive(false);
                 module3.SetActive(false);
                 credits.SetActive(false);
+                ModuleNumber = 1;
                 break;
             case 2:
                 camAnim.SetInteger("view", BOTTOM_1);
@@ -77,7 +85,10 @@ public class MainMenu : MonoBehaviour
                 module2.SetActive(true);
                 module3.SetActive(false);
                 credits.SetActive(false);
+                module2Levels.SetActive(true);
+                module2Info.SetActive(false);
                 camAnim.SetTrigger("switch");
+                ModuleNumber = 2;
                 LoadModule2();
                 break;
             case 3:
@@ -95,6 +106,7 @@ public class MainMenu : MonoBehaviour
                 module2.SetActive(false);
                 module3.SetActive(false);
                 credits.SetActive(true);
+                ModuleNumber = 3;
                 break;
         }
     }
@@ -133,6 +145,7 @@ public class MainMenu : MonoBehaviour
     IEnumerator InstantiateButtons()
     {
         yield return new WaitForSeconds(0.4f);
+        int number = 1;
 
         for (int i = 0; i < 4; i++)
         {
@@ -142,13 +155,93 @@ public class MainMenu : MonoBehaviour
             {
                 GameObject obj = Instantiate(module2MapButton);
                 spawnedMapButtons.Add(obj);
-                obj.transform.SetParent(module2.transform);
+                obj.transform.SetParent(module2Levels.transform);
                 obj.transform.localPosition = pos;
+
+                obj.name = "PreLevel" + number.ToString();
+
+                RankingManager.Record? bestResult = RankingManager.GetTheBestRecord("PreLevel" + number.ToString());
+
+                if (bestResult != null)
+                {
+                    obj.transform.GetChild(0).GetComponent<TMPro.TextMeshPro>().text += $" <size=\"1\"><b>{((RankingManager.Record)bestResult).points.ToString()}</b></size>";
+                }
+                else
+                {
+                    obj.transform.GetChild(0).GetComponent<TMPro.TextMeshPro>().text += " <size=\"1\"><b>0</b></size>";
+                }
+
+                Button3D btn = obj.GetComponent<Button3D>();
+
+                btn.OnClick.AddListener((sender) =>
+                {
+                    module2Levels.SetActive(false);
+                    module2Info.SetActive(true);
+
+                    currentLevelModule2 = sender.name;
+
+                    RankingManager.Record[] records = RankingManager.GetRecords(currentLevelModule2);
+                    TMPro.TextMeshPro text = module2Info.transform.GetChild(2).GetComponent<TMPro.TextMeshPro>();
+                    text.text = "";
+
+                    foreach (RankingManager.Record r in records)
+                    {
+                        text.text += $"Points: <b>{r.points.ToString()} | </b>Count of moves: <b>{r.moves.ToString()}</b> | Date: <b>{r.date.ToShortDateString()} {r.date.ToShortTimeString()}</b>\n";
+                    }
+
+                    Button3D playBtn = module2Info.transform.GetChild(4).GetComponent<Button3D>();
+                    playBtn.OnClick.RemoveAllListeners();
+                    playBtn.OnClick.AddListener(s =>
+                    {
+                        StartCoroutine(Coroutine());
+
+                        IEnumerator Coroutine()
+                        {
+                            camAnim.SetInteger("view", LEVEL);
+                            camAnim.SetTrigger("switch");
+
+                            yield return new WaitForSeconds(0.5f);
+
+                            if (spawnModule2ButtonsCor != null)
+                            {
+                                StopCoroutine(spawnModule2ButtonsCor);
+                                spawnModule2ButtonsCor = null;
+                            }
+
+                            foreach (GameObject o in spawnedMapButtons)
+                            {
+                                Destroy(o);
+                            }
+
+                            spawnedMapButtons.Clear();
+
+                            module1.SetActive(false);
+                            module2.SetActive(false);
+                            module3.SetActive(false);
+                            credits.SetActive(false);
+
+                            camAnim.enabled = false;
+
+                            MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/" + sender.name + ".xml");
+                            Map deserializedMap = serializer.Deserialize();
+                            LevelManager.CurrentManager.SetBackgroundColor(deserializedMap.biomeType);
+                            LevelManager.CurrentManager.LoadLevel(deserializedMap);
+                        }
+                    });
+                });
+                
+                number++;
                 pos += new Vector3(5.3f, 0f, 0f);
                 yield return new WaitForSeconds(0.075f);
             }
         }
 
         spawnModule2ButtonsCor = null;
+    }
+
+    public void CloseModule2LevelInfo()
+    {
+        module2Levels.SetActive(true);
+        module2Info.SetActive(false);
     }
 }

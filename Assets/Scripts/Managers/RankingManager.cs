@@ -3,12 +3,14 @@ using System.IO;
 using System.Xml;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 public static class RankingManager
 {
     public static string PathToRankFile => Path.Combine(Application.dataPath, "Save/Ranking.xml");
+    public const int MAX_RECORDS = 20;
 
-    public static void AddRecord(Map map, float time, int movesCount)
+    public static void AddRecord(Record r)
     {
         PrepareFile();
 
@@ -19,19 +21,50 @@ public static class RankingManager
 
         XmlNode record = doc.CreateNode(XmlNodeType.Element, "Record", null);
         XmlAttribute attr = doc.CreateAttribute("map");
-        attr.Value = map.name;
+        attr.Value = r.name;
         record.Attributes.Append(attr);
 
         attr = doc.CreateAttribute("moves");
-        attr.Value = movesCount.ToString();
+        attr.Value = r.moves.ToString();
         record.Attributes.Append(attr);
 
-        attr = doc.CreateAttribute("time");
-        attr.Value = time.ToString();
+        attr = doc.CreateAttribute("points");
+        attr.Value = r.points.ToString();
+        record.Attributes.Append(attr);
+
+        attr = doc.CreateAttribute("date");
+        attr.Value = r.date.ToString();
         record.Attributes.Append(attr);
 
         rootNode.AppendChild(record);
+
+        Record[] records = GetRecords(r.name);
+
+        if(records.Length >= MAX_RECORDS)
+        {
+            records = records.OrderByDescending(item => item.points).ThenByDescending(item => item.date).ToArray();
+            string date = records[records.Length - 1].date.ToString();
+
+            XmlNodeList recs = doc.SelectSingleNode("Ranking").SelectNodes("Record");
+
+            for (int i = 0; i < recs.Count; i++)
+            {
+                if (recs[i].Attributes.GetNamedItem("date").Value.Trim() == date)
+                {
+                    doc.SelectSingleNode("Ranking").RemoveChild(recs[i]);
+                    break;
+                }
+            }
+        }
+
         doc.Save(PathToRankFile);
+    }
+
+    public static Record? GetTheBestRecord(string mapName)
+    {
+        Record[] records = GetRecords(mapName);
+        if (records == null || records.Length == 0) return null;
+        return records[0];
     }
 
     public static Record[] GetRecords(string mapName)
@@ -49,16 +82,17 @@ public static class RankingManager
             if(records[i].Attributes.GetNamedItem("map").Value.Trim() == mapName)
             {
                 Record record = new Record(
-                    mapName, 
-                    int.Parse(records[i].Attributes.GetNamedItem("moves").Value), 
-                    float.Parse(records[i].Attributes.GetNamedItem("time").Value)
+                    records[i].Attributes.GetNamedItem("map").Value, 
+                    int.Parse(records[i].Attributes.GetNamedItem("moves").Value),
+                    int.Parse(records[i].Attributes.GetNamedItem("points").Value),
+                    DateTime.Parse(records[i].Attributes.GetNamedItem("date").Value)
                     );
 
                 entries.Add(record);
             }
         }
 
-        entries = entries.OrderBy(item => item.time).ToList();
+        entries = entries.OrderByDescending(item => item.points).ThenByDescending(item => item.date).ToList();
         return entries.ToArray();
     }
 
@@ -87,13 +121,15 @@ public static class RankingManager
     {
         public string name;
         public int moves;
-        public float time;
+        public int points;
+        public DateTime date;
 
-        public Record(string name, int moves, float time)
+        public Record(string name, int moves, int points, DateTime date)
         {
             this.name = name;
             this.moves = moves;
-            this.time = time;
+            this.points = points;
+            this.date = date;
         }
     }
 }

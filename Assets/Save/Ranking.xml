@@ -1,7 +1,17 @@
 <?xml version="1.0"?>
 <Ranking>
-  <Record map="Level4" moves="2" time="0,15" />
-  <Record map="Level1" moves="28" time="4,64" />
-  <Record map="Level4" moves="2" time="0,15" />
-  <Record map="Level4" moves="6" time="1,31" />
+  <Record map="PreLevel1" moves="30" points="667" date="27.03.2021 22:35:40" />
+  <Record map="PreLevel1" moves="30" points="667" date="27.03.2021 22:42:12" />
+  <Record map="PreLevel1" moves="28" points="714" date="27.03.2021 22:45:56" />
+  <Record map="PreLevel1" moves="17" points="941" date="27.03.2021 22:49:40" />
+  <Record map="PreLevel1" moves="28" points="714" date="27.03.2021 23:40:47" />
+  <Record map="PreLevel1" moves="28" points="714" date="27.03.2021 23:47:46" />
+  <Record map="PreLevel1" moves="28" points="714" date="27.03.2021 23:48:43" />
+  <Record map="PreLevel1" moves="28" points="714" date="27.03.2021 23:51:32" />
+  <Record map="PreLevel1" moves="28" points="714" date="27.03.2021 23:55:04" />
+  <Record map="Level4" moves="2" points="2000" date="28.03.2021 00:00:24" />
+  <Record map="Level4" moves="2" points="2000" date="28.03.2021 00:02:25" />
+  <Record map="Level4" moves="7" points="0" date="28.03.2021 00:02:45" />
+  <Record map="Level4" moves="2" points="2000" date="28.03.2021 00:02:51" />
+  <Record map="Level1" moves="28" points="714" date="28.03.2021 00:03:15" />
 </Ranking>

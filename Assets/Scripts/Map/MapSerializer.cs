@@ -104,7 +104,7 @@ public class MapSerializer
         Map map = new Map(name, elements, biomeType, difficulty);
         return map;
     }
-
+    
     /// <summary>
     /// Serialize given <seealso cref="Map"/> and saves it to previously given file.
     /// </summary>

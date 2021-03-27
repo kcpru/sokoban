@@ -55,7 +55,7 @@ public class MapManager : MonoBehaviour
     private const float Y_OFFSET = 1f;
 
     public static MapManager CurrentMapManager { get; private set; }
-    public bool CanMove { get; private set; } = false;
+    public bool CanMove { get; set; } = false;
     public Transform MapRoot => transform;
 
     /// <summary>
@@ -337,7 +337,7 @@ public class MapManager : MonoBehaviour
 
         element.position = new Vector3(Mathf.RoundToInt(element.position.x), element.position.y, Mathf.RoundToInt(element.position.z));
 
-        if (!currentMap.IsAllGoalsDone)
+        if (!currentMap.IsAllGoalsDone && !LevelManager.CurrentManager.IsPaused)
             CanMove = true;
     }
 

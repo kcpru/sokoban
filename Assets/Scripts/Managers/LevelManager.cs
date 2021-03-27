@@ -9,10 +9,13 @@ public class LevelManager : MonoBehaviour
 {
     [Header("Common settings")]
     [SerializeField] private Camera cam;
+    [SerializeField] private MainMenu mainMenu;
 
     [Header("UI")]
-    [SerializeField] private Animator winScreen;
+    [SerializeField] private Animator winScreenModule1;
+    [SerializeField] private Animator winScreenModule2;
     [SerializeField] private Animator levelUI;
+    [SerializeField] private Animator pauseMenu;
 
     [Header("Module 1")]
     [SerializeField] private TextAsset[] easyLevels;
@@ -29,18 +32,26 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private float changeColorSpeed = 10f;
 
     public int CurrentMovesCount { get; private set; }
+    public bool IsPaused { get; private set; }
     public Difficulty CurrentDifficulty { get; private set; }
+    public bool IsPlaying => CurrentMap != null;
+    public Map CurrentMap => MapManager.CurrentMapManager.currentMap;
+
+    public int Points // CHUJOWY WZÓR - NOWY TRZEBA ZROBIÆ
+    {
+        get
+        {
+            int allTargets = CurrentMap.ElementCount(ElementType.Target) + CurrentMap.ElementCount(ElementType.DoneTarget) + CurrentMap.ElementCount(ElementType.PlayerOnTarget);
+            int count = Mathf.RoundToInt(100 * (allTargets * 10) * (CurrentMap.ElementCount(ElementType.DoneTarget) / (float)allTargets) / (CurrentMovesCount / 4f));
+
+            return count;
+        }
+    }
 
     public static LevelManager CurrentManager { get; protected set; }
 
     private Color targetBackgroundColor;
     private TextMeshPro movesText;
-    private TextMeshPro timeText;
-
-    private float timer = 0f;
-    private bool timerOn = false;
-
-    public float CurrentTime => (float)System.Math.Round(timer, 2);
 
     private void Awake() => CurrentManager = this;
 
@@ -50,19 +61,15 @@ public class LevelManager : MonoBehaviour
         MapManager.CurrentMapManager.OnPlayerMove += OnPlayerMove;
 
         movesText = levelUI.transform.GetChild(0).GetComponent<TextMeshPro>();
-        timeText = levelUI.transform.GetChild(1).GetComponent<TextMeshPro>();
     }
 
     private void Update()
     {
         cam.backgroundColor = Color.Lerp(cam.backgroundColor, targetBackgroundColor, Time.deltaTime * changeColorSpeed);
 
-        if (timerOn)
+        if(Input.GetKeyDown(KeyCode.Escape))
         {
-            timer += Time.deltaTime;
-            string s = ((float)System.Math.Round(timer, 2)).ToString();
-            s = s.Replace(',', ':');
-            timeText.text = s;
+            SwitchPauseMenu(!IsPaused);
         }
     }
 
@@ -71,10 +78,7 @@ public class LevelManager : MonoBehaviour
         CurrentMovesCount++;
         movesText.text = CurrentMovesCount.ToString();
 
-        if (CurrentMovesCount == 1)
-            StartTimer();
-
-        if (MapManager.CurrentMapManager.currentMap.IsAllGoalsDone)
+        if (CurrentMap.IsAllGoalsDone)
         {
             StartCoroutine(Win());
 
@@ -82,50 +86,43 @@ public class LevelManager : MonoBehaviour
             {
                 print("<color=green>WIN</color>");
 
-                StopTimer();
-
                 yield return new WaitForSeconds(1f);
 
                 levelUI.SetBool("show", false);
                 movesText.text = "0";
-                timeText.text = "0:0";
 
-                RankingManager.AddRecord(MapManager.CurrentMapManager.currentMap, CurrentTime, CurrentMovesCount);
+                SaveRecord();
 
-                RankingManager.Record[] records = RankingManager.GetRecords(MapManager.CurrentMapManager.currentMap.name); 
-                TextMeshPro text = winScreen.transform.GetChild(0).GetChild(0).GetComponent<TextMeshPro>();
+                RankingManager.Record[] records = RankingManager.GetRecords(CurrentMap.name);
+                TextMeshPro text = MainMenu.ModuleNumber == 2 ? winScreenModule2.transform.GetChild(0).GetChild(0).GetComponent<TextMeshPro>() :
+                    winScreenModule1.transform.GetChild(0).GetChild(0).GetComponent<TextMeshPro>();
                 text.text = "";
 
-                foreach (RankingManager.Record record in records)
+                foreach (RankingManager.Record r in records)
                 {
-                    text.text += $"Count of moves: <b>{record.moves}</b> | Time: <b>{record.time}</b>\n";
+                    text.text += $"Points: <b>{r.points.ToString()} | </b>Count of moves: <b>{r.moves.ToString()}</b> | Date: <b>{r.date.ToShortDateString()} {r.date.ToShortTimeString()}</b>\n";
                 }
 
                 MapManager.CurrentMapManager.ClearMap();
                 yield return new WaitForSeconds(
                     (MapManager.CurrentMapManager.allCreatedElements.Count * MapManager.CurrentMapManager.destroyElementDelay) + 1f);
 
-                winScreen.SetBool("show", true);
+                if (MainMenu.ModuleNumber == 1)
+                    winScreenModule1.SetBool("show", true);
+                else if (MainMenu.ModuleNumber == 2)
+                    winScreenModule2.SetBool("show", true);
+
                 cam.transform.rotation = Quaternion.identity;
 
-                timer = 0f;
                 CurrentMovesCount = 0;
             }
         }
     }
 
-    private void StartTimer()
-    {
-        timer = 0f;
-        timerOn = true;
-    }
-
-    private void StopTimer() => timerOn = false;
-
     public void NextLevel()
     {
-        if (!winScreen.GetBool("show")) return;
-        winScreen.SetBool("show", false);
+        if (!winScreenModule1.GetBool("show")) return;
+        winScreenModule1.SetBool("show", false);
 
         StartCoroutine(NextLevelCoroutine());
 
@@ -141,22 +138,66 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    public void FinishLevel()
+    {
+        if (!IsPlaying) return;
+
+        if (CurrentMovesCount > 0)
+            SaveRecord();
+
+        BackToMenu();
+    }
+
     public void BackToMenu()
     {
         StartCoroutine(BackToMenuCoroutine());
 
         IEnumerator BackToMenuCoroutine()
         {
-            winScreen.SetBool("show", false);
+            movesText.text = "0";
+            CurrentMovesCount = 0;
+
+            levelUI.SetBool("show", false);
+            SwitchPauseMenu(false);
+
+            if(CurrentMap != null)
+            {
+                MapManager.CurrentMapManager.ClearMap();
+
+                yield return new WaitForSeconds(
+                    (MapManager.CurrentMapManager.allCreatedElements.Count * MapManager.CurrentMapManager.destroyElementDelay) + 1f);
+            }
+
+            cam.transform.rotation = Quaternion.identity;
+            winScreenModule1.SetBool("show", false);
+            winScreenModule2.SetBool("show", false);
 
             yield return new WaitForSeconds(0.5f);
 
             SetMainMenuBackgroundColor();
             Animator camAnim = cam.GetComponent<Animator>();
             camAnim.enabled = true;
-            camAnim.SetInteger("view", MainMenu.MAIN_MENU);
+            mainMenu.OpenPage(MainMenu.ModuleNumber == 2 ? 2 : 0);
             camAnim.SetTrigger("switch");
         }
+    }
+
+    public void BackToMenuAndSaveProgress()
+    {
+        SaveProgress();
+        BackToMenu();
+    }
+
+    private void SaveProgress()
+    {
+        Debug.Log("TODO: Save operations");
+    }
+
+    private void SaveRecord()
+    {
+        RankingManager.Record record =
+                    new RankingManager.Record(CurrentMap.name, CurrentMovesCount, Points, System.DateTime.Now);
+        RankingManager.AddRecord(record);
     }
 
     /// <summary>
@@ -199,6 +240,15 @@ public class LevelManager : MonoBehaviour
                 targetBackgroundColor = lavaBiomeColor;
                 break;
         }
+    }
+
+    public void SwitchPauseMenu(bool isOn)
+    {
+        if (!IsPlaying || (isOn && !MapManager.CurrentMapManager.CanMove)) return;
+
+        pauseMenu.SetBool("show", isOn);
+        MapManager.CurrentMapManager.CanMove = !isOn;
+        IsPaused = isOn;
     }
 
     /// <summary>

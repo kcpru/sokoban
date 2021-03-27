@@ -94,6 +94,25 @@ public class Map
     }
 
     /// <summary>
+    /// Return count of given element on the map.
+    /// </summary>
+    public int ElementCount(ElementType elementType)
+    {
+        int count = 0;
+
+        for (int i = 0; i < mapDefinition.GetLength(0); i++)
+        {
+            for (int j = 0; j < mapDefinition.GetLength(1); j++)
+            {
+                if (mapDefinition[i, j] == elementType)
+                    count++;
+            }
+        }
+
+        return count;
+    }
+
+    /// <summary>
     /// Checks whether the given map has only one player.
     /// </summary>
     /// <param name="map">Array to check.</param>
