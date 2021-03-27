@@ -5,6 +5,7 @@ using UnityEngine;
 /// </summary>
 public class Map
 {
+    public string name;
     public Vector2Int mapSize;
     public ElementType[,] mapDefinition;
     public Biomes biomeType = Biomes.Grass;
@@ -44,7 +45,7 @@ public class Map
     /// Creates new map which contains given elements.
     /// </summary>
     /// <param name="map">Elements</param>
-    public Map(ElementType[,] map)
+    public Map(string name, ElementType[,] map)
     {
         mapSize = new Vector2Int(map.GetLength(1), map.GetLength(0));
 
@@ -61,6 +62,7 @@ public class Map
         }
 
         mapDefinition = map;
+        this.name = name;
     }
 
     /// <summary>
@@ -69,7 +71,7 @@ public class Map
     /// <param name="map">Elements</param>
     /// <param name="biomeType">Type of biome</param>
     /// <param name="difficulty">Level of difficulty</param>
-    public Map(ElementType[,] map, Biomes biomeType, Difficulty difficulty)
+    public Map(string name, ElementType[,] map, Biomes biomeType, Difficulty difficulty)
     {
         mapSize = new Vector2Int(map.GetLength(1), map.GetLength(0));
 
@@ -86,6 +88,7 @@ public class Map
         }
 
         mapDefinition = map;
+        this.name = name;
         this.difficulty = difficulty;
         this.biomeType = biomeType;
     }

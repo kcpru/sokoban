@@ -100,7 +100,8 @@ public class MapSerializer
             }
         }
 
-        Map map = new Map(elements, biomeType, difficulty);
+        string name = System.IO.Path.GetFileNameWithoutExtension(Path);
+        Map map = new Map(name, elements, biomeType, difficulty);
         return map;
     }
 

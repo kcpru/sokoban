@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<SokobanLevel difficulty="Easy" biome="Grass">
+<SokobanLevel difficulty="Easy" biome="Desert">
   <LevelStructure width="8" height="8">
     <Row>GGAAAGGG</Row>
     <Row>GGPGGGGG</Row>

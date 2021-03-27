@@ -82,7 +82,7 @@ public class MapManager : MonoBehaviour
             { ElementType.Air, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground,ElementType.Ground, ElementType.Target}
         };
 
-        Map map = new Map(arr);
+        Map map = new Map("test", arr);
 
         //if (map.IsMapDefined)
         //    CreateMap(map);
