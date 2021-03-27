@@ -71,6 +71,11 @@ public class MainMenu : MonoBehaviour
 
     private IEnumerator OpenLevelCoroutine(Difficulty difficulty)
     {
+        MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/" + LevelManager.CurrentManager.RandomMap(difficulty).name + ".xml");
+        Map deserializedMap = serializer.Deserialize();
+
+        LevelManager.CurrentManager.SetBackgroundColor(deserializedMap.biomeType);
+
         camAnim.SetInteger("view", LEVEL);
         camAnim.SetTrigger("switch");
 
@@ -83,8 +88,6 @@ public class MainMenu : MonoBehaviour
 
         camAnim.enabled = false;
 
-        MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/" + LevelManager.CurrentManager.RandomMap(difficulty).name + ".xml");
-        Map deserializedMap = serializer.Deserialize();
-        LevelManager.CurrentManager.LoadLevel(deserializedMap, camTrans);
+        LevelManager.CurrentManager.LoadLevel(deserializedMap);
     }
 }

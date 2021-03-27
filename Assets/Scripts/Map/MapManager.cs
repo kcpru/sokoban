@@ -20,7 +20,7 @@ public class MapManager : MonoBehaviour
     [Header("Map creation settings")]
     [SerializeField] private bool skipCreateAnimation = false;
     [SerializeField] private float createElementDelay = 0.1f;
-    [SerializeField] private float destroyElementDelay = 0.05f;
+                     public float destroyElementDelay = 0.05f;
     [SerializeField] private float createAnimationScale = 1.2f;
     [SerializeField] private float createAnimationUpScaleSpeed = 8f;
     [SerializeField] private float createAnimationDownScaleSpeed = 5f;
@@ -104,8 +104,6 @@ public class MapManager : MonoBehaviour
 
     private IEnumerator CreateMapCoroutine(Map mapToLoad)
     {
-        yield return new WaitForSeconds(1f);
-
         currentMap = mapToLoad;
         currentElements = new GameObject[currentMap.mapSize.y, currentMap.mapSize.x];
         Vector3 pos = new Vector3(0, 0, 0);
@@ -172,7 +170,6 @@ public class MapManager : MonoBehaviour
     private IEnumerator ClearMapCoroutine()
     {
         CanMove = false;
-        yield return new WaitForSeconds(1f);
 
         for (int i = 0; i < allCreatedElements.Count; i++)
         {
