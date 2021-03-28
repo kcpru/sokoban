@@ -3,6 +3,7 @@ using UnityEngine.Events;
 
 public class Button3D : MonoBehaviour
 {
+    public bool isClickable = true;
     public UnityEvent<MonoBehaviour> OnClick = new UnityEvent<MonoBehaviour>();
 
     private bool isMouseOver = false;
@@ -17,7 +18,7 @@ public class Button3D : MonoBehaviour
 
     private void OnMouseExit() => isMouseOver = false;
 
-    private void OnMouseDown() => click = true;
+    private void OnMouseDown() => click = true && isClickable;
 
     private void OnMouseUp()
     {

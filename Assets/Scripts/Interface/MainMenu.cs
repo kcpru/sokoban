@@ -175,6 +175,9 @@ public class MainMenu : MonoBehaviour
 
                 btn.OnClick.AddListener((sender) =>
                 {
+                    MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/" + sender.name + ".xml");
+                    Map deserializedMap = serializer.Deserialize();
+
                     module2Levels.SetActive(false);
                     module2Info.SetActive(true);
 
@@ -190,9 +193,58 @@ public class MainMenu : MonoBehaviour
                     }
 
                     Button3D playBtn = module2Info.transform.GetChild(4).GetComponent<Button3D>();
+                    Button3D playSavedBtn = module2Info.transform.GetChild(5).GetComponent<Button3D>();
+
+                    playSavedBtn.isClickable = SaveLoadManager.SaveExists(deserializedMap);
+
+                    playSavedBtn.OnClick.RemoveAllListeners();
+
+                    if(playSavedBtn.isClickable)
+                    {
+                        playSavedBtn.OnClick.AddListener(s =>
+                        {
+                            Map progressedMap = SaveLoadManager.LoadLevelProgress(deserializedMap, out int movesCount);
+
+                            StartCoroutine(Coroutine());
+
+                            IEnumerator Coroutine()
+                            {
+                                camAnim.SetInteger("view", LEVEL);
+                                camAnim.SetTrigger("switch");
+
+                                yield return new WaitForSeconds(0.5f);
+
+                                if (spawnModule2ButtonsCor != null)
+                                {
+                                    StopCoroutine(spawnModule2ButtonsCor);
+                                    spawnModule2ButtonsCor = null;
+                                }
+
+                                foreach (GameObject o in spawnedMapButtons)
+                                {
+                                    Destroy(o);
+                                }
+
+                                spawnedMapButtons.Clear();
+
+                                module1.SetActive(false);
+                                module2.SetActive(false);
+                                module3.SetActive(false);
+                                credits.SetActive(false);
+
+                                camAnim.enabled = false;
+
+                                LevelManager.CurrentManager.SetBackgroundColor(progressedMap.biomeType);
+                                LevelManager.CurrentManager.LoadLevel(progressedMap, movesCount);
+                            }
+                        });
+                    }
+
                     playBtn.OnClick.RemoveAllListeners();
                     playBtn.OnClick.AddListener(s =>
                     {
+                        SaveLoadManager.ClearSave(deserializedMap);
+
                         StartCoroutine(Coroutine());
 
                         IEnumerator Coroutine()
@@ -222,8 +274,6 @@ public class MainMenu : MonoBehaviour
 
                             camAnim.enabled = false;
 
-                            MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/" + sender.name + ".xml");
-                            Map deserializedMap = serializer.Deserialize();
                             LevelManager.CurrentManager.SetBackgroundColor(deserializedMap.biomeType);
                             LevelManager.CurrentManager.LoadLevel(deserializedMap);
                         }

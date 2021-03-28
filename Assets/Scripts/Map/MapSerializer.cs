@@ -101,6 +101,7 @@ public class MapSerializer
         }
 
         string name = System.IO.Path.GetFileNameWithoutExtension(Path);
+        if (name.Contains("_save")) name = name.Remove(name.LastIndexOf('_'), 5);
         Map map = new Map(name, elements, biomeType, difficulty);
         return map;
     }

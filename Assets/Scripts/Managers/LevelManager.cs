@@ -48,7 +48,7 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    public static LevelManager CurrentManager { get; protected set; }
+    public static LevelManager CurrentManager { get; private set; }
 
     private Color targetBackgroundColor;
     private TextMeshPro movesText;
@@ -80,6 +80,7 @@ public class LevelManager : MonoBehaviour
 
         if (CurrentMap.IsAllGoalsDone)
         {
+            SaveLoadManager.ClearSave(CurrentMap);
             StartCoroutine(Win());
 
             IEnumerator Win()
@@ -117,6 +118,10 @@ public class LevelManager : MonoBehaviour
                 CurrentMovesCount = 0;
             }
         }
+        else
+        {
+            SaveProgress();
+        }
     }
 
     public void NextLevel()
@@ -145,6 +150,7 @@ public class LevelManager : MonoBehaviour
         if (CurrentMovesCount > 0)
             SaveRecord();
 
+        SaveLoadManager.ClearSave(CurrentMap);
         BackToMenu();
     }
 
@@ -190,13 +196,14 @@ public class LevelManager : MonoBehaviour
 
     private void SaveProgress()
     {
-        Debug.Log("TODO: Save operations");
+        if (!IsPlaying) return;
+
+        SaveLoadManager.SaveLevelProgress(CurrentMap, CurrentMovesCount);
     }
 
     private void SaveRecord()
     {
-        RankingManager.Record record =
-                    new RankingManager.Record(CurrentMap.name, CurrentMovesCount, Points, System.DateTime.Now);
+        RankingManager.Record record = new RankingManager.Record(CurrentMap.name, CurrentMovesCount, Points, System.DateTime.Now);
         RankingManager.AddRecord(record);
     }
 
@@ -204,7 +211,14 @@ public class LevelManager : MonoBehaviour
     /// Loads given <seealso cref="Map"/> and sets correct camera position.
     /// </summary>
     /// <param name="map"><seealso cref="Map"/> to load</param>
-    public void LoadLevel(Map map)
+    public void LoadLevel(Map map) => LoadLevel(map, 0);
+
+    /// <summary>
+    /// Loads given <seealso cref="Map"/> and sets correct camera position. Additionaly sets CurrentMovesCount to given value.
+    /// </summary>
+    /// <param name="map"><seealso cref="Map"/> to load</param>
+    /// <param name="movesCount">Moves count to set</param>
+    public void LoadLevel(Map map, int movesCount)
     {
         levelUI.SetBool("show", true);
         MapManager.CurrentMapManager.CreateMap(map);
@@ -214,7 +228,10 @@ public class LevelManager : MonoBehaviour
         cam.transform.LookAt(new Vector3(map.mapSize.x / 2f, 0f, map.mapSize.y * -0.5f));
         cam.transform.eulerAngles = new Vector3(cam.transform.eulerAngles.x + 5f, 0f, 0f);
 
+        CurrentMovesCount = movesCount;
         CurrentDifficulty = map.difficulty;
+
+        movesText.text = CurrentMovesCount.ToString();
     }
 
     /// <summary>
