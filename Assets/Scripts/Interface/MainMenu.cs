@@ -17,6 +17,9 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private GameObject module2MapButton;
     private List<GameObject> spawnedMapButtons = new List<GameObject>();
 
+    [Header("Module 3")]
+    [SerializeField] private MapEditor mapEditor;
+
     public const int MAIN_MENU = 0;
     public const int BOTTOM_1 = 1;
     public const int LEVEL = 2;
@@ -39,7 +42,7 @@ public class MainMenu : MonoBehaviour
     /// <summary>
     /// Opens page with given index.
     /// </summary>
-    /// <param name="view">0 - main menu, 1 - module 1, 2 - module 2, 3 - module  3, 4 - credits</param>
+    /// <param name="view">0 - main menu, 1 - module 1, 2 - module 2, 3 - module 3, 4 - credits</param>
     public void OpenPage(int view)
     {
         if(module2.activeSelf)
@@ -99,8 +102,8 @@ public class MainMenu : MonoBehaviour
                 camAnim.SetInteger("view", BOTTOM_1);
                 camAnim.SetTrigger("switch");
                 module1.SetActive(false);
-                module2.SetActive(true);
-                module3.SetActive(false);
+                module2.SetActive(false);
+                module3.SetActive(true);
                 credits.SetActive(false);
                 break;
             case 4:
@@ -123,7 +126,6 @@ public class MainMenu : MonoBehaviour
         Map deserializedMap = serializer.Deserialize();
 
         LevelManager.CurrentManager.SetBackgroundColor(deserializedMap.biomeType);
-        print(deserializedMap.name);
 
         camAnim.SetInteger("view", LEVEL);
         camAnim.SetTrigger("switch");
@@ -291,6 +293,27 @@ public class MainMenu : MonoBehaviour
         }
 
         spawnModule2ButtonsCor = null;
+    }
+
+    public void NewMap()
+    {
+        StartCoroutine(NewMapCoroutine());
+
+        IEnumerator NewMapCoroutine()
+        {
+            camAnim.SetInteger("view", LEVEL);
+            camAnim.SetTrigger("switch");
+
+            yield return new WaitForSeconds(0.5f);
+
+            module1.SetActive(false);
+            module2.SetActive(false);
+            module3.SetActive(false);
+            credits.SetActive(false);
+
+            camAnim.enabled = false;
+            mapEditor.InitializeEditor(new Vector2Int(12, 8));
+        }
     }
 
     /// <summary>

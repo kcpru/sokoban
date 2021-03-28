@@ -11,6 +11,10 @@ public class MapDecoration : MonoBehaviour
     [SerializeField] private float spawnAnimationSpeed = 7.5f;
     [SerializeField] private Vector2Int maxElementSize;
     [SerializeField] private GameObject[] grassBiomeObjects;
+    [SerializeField] private GameObject[] desertBiomeObjects;
+    [SerializeField] private GameObject[] winterBiomeObjects;
+    [SerializeField] private GameObject[] lavalBiomeObjects;
+    [SerializeField] private GameObject[] rockBiomeObjects;
 
     private List<GameObject> spawnedElements = new List<GameObject>();
 
@@ -142,6 +146,18 @@ public class MapDecoration : MonoBehaviour
         {
             case Biomes.Grass:
                 objectsPool = grassBiomeObjects;
+                break;
+            case Biomes.Desert:
+                objectsPool = desertBiomeObjects;
+                break;
+            case Biomes.Winter:
+                objectsPool = winterBiomeObjects;
+                break;
+            case Biomes.Lava:
+                objectsPool = lavalBiomeObjects;
+                break;
+            case Biomes.Rock:
+                objectsPool = rockBiomeObjects;
                 break;
         }
 

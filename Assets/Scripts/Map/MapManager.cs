@@ -16,6 +16,8 @@ public class MapManager : MonoBehaviour
     [SerializeField] private GameObject targetElement;
     [SerializeField] private GameObject groundElement;
     [SerializeField] private GameObject boxElement;
+                     public Material boxMaterial;
+                     public Material targetDoneMaterial;
 
     [Header("Map creation settings")]
     [SerializeField] private bool skipCreateAnimation = false;
@@ -26,7 +28,7 @@ public class MapManager : MonoBehaviour
     [SerializeField] private float createAnimationDownScaleSpeed = 5f;
 
     /// <summary>
-    /// Currently load map.
+    /// Currently loaded map.
     /// </summary>
     public Map currentMap;
 
@@ -124,6 +126,9 @@ public class MapManager : MonoBehaviour
                     newElem = Instantiate(elementToSpawn, new Vector3(pos.x, yPos, -y), Quaternion.identity, MapRoot);
                     allCreatedElements.Add(newElem);
                     StartCoroutine(NewElementAnimation(newElem.transform));
+
+                    if(elementType == ElementType.DoneTarget)
+                        newElem.GetComponent<Renderer>().material = targetDoneMaterial;
 
                     if (elementType != ElementType.Ground && elementType != ElementType.Air)
                         currentElements[y, x] = newElem;
@@ -233,11 +238,13 @@ public class MapManager : MonoBehaviour
                 if (GetElementType(newBoxPos) == ElementType.Target)
                 {
                     Debug.Log("<color=green>ENTER TARGET</color>");
+                    currentElements[newPos.y, newPos.x].GetComponent<Renderer>().material = targetDoneMaterial;
                 }
 
                 if(GetElementType(newPos) == ElementType.DoneTarget)
                 {
                     Debug.Log("<color=red>EXIT TARGET</color>");
+                    currentElements[newPos.y, newPos.x].GetComponent<Renderer>().material = boxMaterial;
                 }
 
                 currentMap.mapDefinition[oldPlayerPos.y, oldPlayerPos.x] = 

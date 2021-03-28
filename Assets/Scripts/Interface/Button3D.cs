@@ -9,11 +9,6 @@ public class Button3D : MonoBehaviour
     private bool isMouseOver = false;
     private bool click = false;
 
-    public void Print(string m)
-    {
-        print(m);
-    }
-
     private void OnMouseEnter() => isMouseOver = true;
 
     private void OnMouseExit() => isMouseOver = false;
