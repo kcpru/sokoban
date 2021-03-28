@@ -105,6 +105,7 @@ public class LevelManager : MonoBehaviour
                 }
 
                 MapManager.CurrentMapManager.ClearMap();
+
                 yield return new WaitForSeconds(
                     (MapManager.CurrentMapManager.allCreatedElements.Count * MapManager.CurrentMapManager.destroyElementDelay) + 1f);
 
@@ -196,7 +197,7 @@ public class LevelManager : MonoBehaviour
 
     private void SaveProgress()
     {
-        if (!IsPlaying) return;
+        if (!IsPlaying || MainMenu.ModuleNumber == 1) return;
 
         SaveLoadManager.SaveLevelProgress(CurrentMap, CurrentMovesCount);
     }

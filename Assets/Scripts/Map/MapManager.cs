@@ -54,6 +54,8 @@ public class MapManager : MonoBehaviour
     private const float X_OFFSET = 1f;
     private const float Y_OFFSET = 1f;
 
+    private MapDecoration mapDecorator;
+
     public static MapManager CurrentMapManager { get; private set; }
     public bool CanMove { get; set; } = false;
     public Transform MapRoot => transform;
@@ -65,31 +67,7 @@ public class MapManager : MonoBehaviour
 
     private void Awake() => CurrentMapManager = this;
 
-    private void Start()
-    {
-        //MapSerializer serializer = new MapSerializer(System.IO.Path.Combine(Application.dataPath, "Maps/Level.xml"));
-        //Map deserializedMap = serializer.Deserialize();
-
-        ElementType[,] arr = new ElementType[8, 8]
-        {
-            { ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Box, ElementType.Ground, ElementType.Target, ElementType.Air, ElementType.Air},
-            { ElementType.Ground, ElementType.PlayerOnTarget, ElementType.Ground, ElementType.Box, ElementType.Air, ElementType.Ground,ElementType.Ground, ElementType.Ground},
-            { ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground,ElementType.Ground, ElementType.Ground},
-            { ElementType.Ground, ElementType.Ground, ElementType.Air, ElementType.Air, ElementType.Air, ElementType.Ground,ElementType.DoneTarget, ElementType.Ground},
-            { ElementType.Ground, ElementType.Ground, ElementType.Air, ElementType.Air, ElementType.Ground, ElementType.Ground,ElementType.Ground, ElementType.Ground},
-            { ElementType.Air, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground,ElementType.Ground, ElementType.Ground},
-            { ElementType.Air, ElementType.Ground, ElementType.Box, ElementType.Air, ElementType.Ground, ElementType.Box, ElementType.Air, ElementType.Target},
-            { ElementType.Air, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground, ElementType.Ground,ElementType.Ground, ElementType.Target}
-        };
-
-        Map map = new Map("test", arr);
-
-        //if (map.IsMapDefined)
-        //    CreateMap(map);
-
-        //if (deserializedMap.IsMapDefined)
-        //    CreateMap(deserializedMap);
-    }
+    private void Start() => mapDecorator = GetComponent<MapDecoration>();
 
     /// <summary>
     /// Instantiates map elements according to given <seealso cref="Map"/>.
@@ -161,6 +139,8 @@ public class MapManager : MonoBehaviour
             pos = new Vector3(0, 0, -pos.z);
         }
 
+        mapDecorator.SpawnDecoration(Biomes.Grass, currentMap.mapSize, 5, 1);
+
         if (!skipCreateAnimation)
             yield return new WaitForSeconds(1f);
 
@@ -177,6 +157,7 @@ public class MapManager : MonoBehaviour
             yield return new WaitForSeconds(destroyElementDelay);
         }
 
+        mapDecorator.ClearSpawnedDecorations();
         allCreatedElements.Clear();
         currentMap = null;
         currentElements = null;
@@ -292,33 +273,6 @@ public class MapManager : MonoBehaviour
 
         if (OnPlayerMove != null) OnPlayerMove.Invoke(newPos);
         return true;
-    }
-
-    public void PrintArrays()
-    {
-        for(int y = 0; y < currentMap.mapSize.y; y++)
-        {
-            string s = "";
-
-            for(int x = 0; x < currentMap.mapSize.x; x++)
-            {
-                s += currentMap.mapDefinition[y, x] + ", ";
-            }
-
-            Debug.Log(s);
-        }
-
-        for (int y = 0; y < currentMap.mapSize.y; y++)
-        {
-            string s = "";
-
-            for (int x = 0; x < currentMap.mapSize.x; x++)
-            {
-                s += (currentElements[y, x] == null ? "null" : currentElements[y, x].name) + ", ";
-            }
-
-            Debug.Log(s);
-        }
     }
 
     /// <summary>
