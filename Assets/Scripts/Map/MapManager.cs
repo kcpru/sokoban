@@ -34,6 +34,9 @@ public class MapManager : MonoBehaviour
     [HideInInspector] public List<GameObject> allCreatedElements = new List<GameObject>();
     public GameObject Player { get; private set; }
 
+    /// <summary>
+    /// Current position of the player on the map.
+    /// </summary>
     public Vector2Int PlayerPosition
     {
         get

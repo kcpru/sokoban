@@ -5,11 +5,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 
+/// <summary>
+/// Class to manage file that stores ranking.
+/// </summary>
 public static class RankingManager
 {
     public static string PathToRankFile => Path.Combine(Application.dataPath, "Save/Ranking.xml");
     public const int MAX_RECORDS = 20;
 
+    /// <summary>
+    /// Adds new <seealso cref="Record"/> to ranking file.
+    /// </summary>
+    /// <param name="r"><seealso cref="Record"/> record to add.</param>
     public static void AddRecord(Record r)
     {
         PrepareFile();
@@ -60,6 +67,11 @@ public static class RankingManager
         doc.Save(PathToRankFile);
     }
 
+    /// <summary>
+    /// Returns best result in given map. If there is no any record, then returns null.
+    /// </summary>
+    /// <param name="mapName">Map from which records will be checked.</param>
+    /// <returns></returns>
     public static Record? GetTheBestRecord(string mapName)
     {
         Record[] records = GetRecords(mapName);
@@ -67,6 +79,11 @@ public static class RankingManager
         return records[0];
     }
 
+    /// <summary>
+    /// Returns array with all records from given map.
+    /// </summary>
+    /// <param name="mapName">Map from which records will be returned.</param>
+    /// <returns></returns>
     public static Record[] GetRecords(string mapName)
     {
         if (!File.Exists(PathToRankFile)) return null;
@@ -96,6 +113,9 @@ public static class RankingManager
         return entries.ToArray();
     }
 
+    /// <summary>
+    /// If directory or file in which ranking is stored don't exist, then creates them and additionaly prepares xml file.
+    /// </summary>
     private static void PrepareFile()
     {
         if (!Directory.Exists(Path.GetDirectoryName(PathToRankFile)))
@@ -117,6 +137,9 @@ public static class RankingManager
         }
     }
 
+    /// <summary>
+    /// Structure which stores information about one result.
+    /// </summary>
     public struct Record
     {
         public string name;

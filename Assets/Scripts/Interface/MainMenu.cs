@@ -36,6 +36,10 @@ public class MainMenu : MonoBehaviour
         camAnim.transform.GetChild(0).GetComponent<Camera>().enabled = true;
     }
 
+    /// <summary>
+    /// Opens page with given index.
+    /// </summary>
+    /// <param name="view">0 - main menu, 1 - module 1, 2 - module 2, 3 - module  3, 4 - credits</param>
     public void OpenPage(int view)
     {
         if(module2.activeSelf)
@@ -287,6 +291,23 @@ public class MainMenu : MonoBehaviour
         }
 
         spawnModule2ButtonsCor = null;
+    }
+
+    /// <summary>
+    /// In build closes game, in editor exits play mode.
+    /// </summary>
+    public void ExitGame()
+    {
+        if(Application.isEditor)
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#endif
+        }
+        else
+        {
+            Application.Quit();
+        }
     }
 
     public void CloseModule2LevelInfo()

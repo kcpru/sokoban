@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Class that creates decorations around the map.
+/// </summary>
 public class MapDecoration : MonoBehaviour
 {
     [SerializeField] private float eachElementDelay = 0.01f;
@@ -11,6 +14,14 @@ public class MapDecoration : MonoBehaviour
 
     private List<GameObject> spawnedElements = new List<GameObject>();
 
+    /// <summary>
+    /// Spawns random decorations in random positions around map. It uses animation.
+    /// </summary>
+    /// <param name="biomeType">Biome type used to select decorations.</param>
+    /// <param name="mapSize">Size of map.</param>
+    /// <param name="radius">Radius in which objects will be spawned.</param>
+    /// <param name="border">Border around map in which objects won't be spawned.</param>
+    /// <param name="createBottomDecoration">Indicates whether create decorations at bottom of map.</param>
     public void SpawnDecoration(Biomes biomeType, Vector2Int mapSize, int radius, int border = 0, bool createBottomDecoration = true)
     {
         if ((radius + border) % 2 == 1) radius--;
@@ -92,6 +103,9 @@ public class MapDecoration : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Removes all previously spawned decorations. It uses animation.
+    /// </summary>
     public void ClearSpawnedDecorations()
     {
         // ANIMATION
@@ -115,6 +129,11 @@ public class MapDecoration : MonoBehaviour
         spawnedElements.Clear();
     }
 
+    /// <summary>
+    /// Returns random element from set that fits to given <seealso cref="Biomes"/>.
+    /// </summary>
+    /// <param name="biomeType">Type of biome - used to select apropiate decorations set.</param>
+    /// <returns></returns>
     public GameObject GetRandomElement(Biomes biomeType)
     {
         GameObject[] objectsPool = null;
