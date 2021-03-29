@@ -14,6 +14,7 @@ public class InputField3D : MonoBehaviour
 
     private bool isFocus = false;
     private bool isCursor = false;
+    private bool isBackspace = false;
 
     private void Start()
     {
@@ -37,6 +38,8 @@ public class InputField3D : MonoBehaviour
             render.material.color = Color.gray;
         }
 
+        isBackspace = Input.GetKey(KeyCode.Backspace);
+
         if (isFocus)
         {
             if(Input.GetKeyDown(KeyCode.Backspace))
@@ -50,7 +53,7 @@ public class InputField3D : MonoBehaviour
             }
             else
             {
-                if (value.Length < maxLength)
+                if (value.Length < maxLength && !isBackspace)
                 {
                     value += Input.inputString;
                     text.text = value;

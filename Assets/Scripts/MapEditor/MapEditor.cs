@@ -202,6 +202,8 @@ public class MapEditor : MonoBehaviour
         isPlayer = false;
         mapName = string.Empty;
         mapPath = string.Empty;
+
+        cam.GetComponent<MapEditorCamera>().DeactivateController();
     }
 
     public void SaveMap()
@@ -322,7 +324,7 @@ public class MapEditor : MonoBehaviour
 
         if(CurrentlySelectedElement == ElementType.DoneTarget)
         {
-            newElem.GetComponent<Renderer>().material = MapManager.CurrentMapManager.targetDoneMaterial;
+            newElem.GetComponent<Box>().EnterTarget();
         }
 
         elements[Mathf.Abs((int)pos.z), Mathf.Abs((int)pos.x)].Add(newElem);

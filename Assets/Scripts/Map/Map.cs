@@ -93,6 +93,8 @@ public class Map
             return;
         }
 
+
+
         this.name = name;
         this.difficulty = difficulty;
         this.biomeType = biomeType;
@@ -175,5 +177,30 @@ public class Map
             return true;
         else
             return false;
+    }
+
+    /// <summary>
+    /// Checks whether count of targets and boxes are more than 0.
+    /// </summary>
+    public static bool ValidateTargets(ref ElementType[,] map)
+    {
+        int boxesCount = 0, targetsCount = 0;
+
+        for (int i = 0; i < map.GetLength(0); i++)
+        {
+            for (int j = 0; j < map.GetLength(1); j++)
+            {
+                if (map[i, j] == ElementType.Box)
+                    boxesCount++;
+
+                if (map[i, j] == ElementType.Target)
+                    targetsCount++;
+            }
+        }
+
+        if (boxesCount == 0 || targetsCount == 0 || boxesCount != targetsCount)
+            return false;
+        else
+            return true;
     }
 }

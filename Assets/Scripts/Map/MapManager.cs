@@ -11,10 +11,6 @@ public class MapManager : MonoBehaviour
     [Header("Movement settings")]
     [SerializeField] private float moveSpeed = 7f;
 
-    [Header("Map elements")]
-    public Material boxMaterial;
-    public Material targetDoneMaterial;
-
     [Header("Map creation settings")]
     [SerializeField] private bool skipCreateAnimation = false;
     [SerializeField] private float createElementDelay = 0.1f;
@@ -130,8 +126,8 @@ public class MapManager : MonoBehaviour
                     allCreatedElements.Add(newElem);
                     StartCoroutine(NewElementAnimation(newElem.transform));
 
-                    if(elementType == ElementType.DoneTarget)
-                        newElem.GetComponent<Renderer>().material = targetDoneMaterial;
+                    if (elementType == ElementType.DoneTarget)
+                        newElem.GetComponent<Box>().EnterTarget();
 
                     if (elementType != ElementType.Ground && elementType != ElementType.Air)
                         currentElements[y, x] = newElem;
@@ -244,13 +240,13 @@ public class MapManager : MonoBehaviour
                 if (GetElementType(newBoxPos) == ElementType.Target)
                 {
                     Debug.Log("<color=green>ENTER TARGET</color>");
-                    currentElements[newPos.y, newPos.x].GetComponent<Renderer>().material = targetDoneMaterial;
+                    currentElements[newPos.y, newPos.x].GetComponent<Box>().EnterTarget();
                 }
 
                 if(GetElementType(newPos) == ElementType.DoneTarget)
                 {
                     Debug.Log("<color=red>EXIT TARGET</color>");
-                    currentElements[newPos.y, newPos.x].GetComponent<Renderer>().material = boxMaterial;
+                    currentElements[newPos.y, newPos.x].GetComponent<Box>().ExitTarget();
                 }
 
                 currentMap.mapDefinition[oldPlayerPos.y, oldPlayerPos.x] = 
