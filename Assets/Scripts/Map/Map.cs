@@ -113,6 +113,17 @@ public class Map
     }
 
     /// <summary>
+    /// Returns cloned map.
+    /// </summary>
+    /// <returns></returns>
+    public Map Clone()
+    {
+        ElementType[,] elements = (ElementType[,])mapDefinition.Clone();
+        Map map = new Map(name, elements, biomeType, difficulty);
+        return map;
+    }
+
+    /// <summary>
     /// Checks whether the given map has only one player.
     /// </summary>
     /// <param name="map">Array to check.</param>

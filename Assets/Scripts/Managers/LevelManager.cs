@@ -52,6 +52,7 @@ public class LevelManager : MonoBehaviour
 
     private Color targetBackgroundColor;
     private TextMeshPro movesText;
+    private Map defaultMap;
 
     private void Awake() => CurrentManager = this;
 
@@ -222,12 +223,13 @@ public class LevelManager : MonoBehaviour
     public void LoadLevel(Map map, int movesCount)
     {
         levelUI.SetBool("show", true);
+        defaultMap = map.Clone();
         MapManager.CurrentMapManager.CreateMap(map);
 
         int max = map.mapSize.x > map.mapSize.y ? map.mapSize.x : map.mapSize.y;
-        cam.transform.position = new Vector3((map.mapSize.x / 2f) - 1f, max * 0.625f, -map.mapSize.y - 1f);
+        cam.transform.position = new Vector3((map.mapSize.x / 2f) - 1f, (max * 0.625f) + (10f * (1f / max)), -map.mapSize.y - 1f);
         cam.transform.LookAt(new Vector3(map.mapSize.x / 2f, 0f, map.mapSize.y * -0.5f));
-        cam.transform.eulerAngles = new Vector3(cam.transform.eulerAngles.x + 5f, 0f, 0f);
+        cam.transform.eulerAngles = new Vector3(cam.transform.eulerAngles.x + (0.45f * max), 0f, 0f);
 
         CurrentMovesCount = movesCount;
         CurrentDifficulty = map.difficulty;
@@ -267,6 +269,33 @@ public class LevelManager : MonoBehaviour
         pauseMenu.SetBool("show", isOn);
         MapManager.CurrentMapManager.CanMove = !isOn;
         IsPaused = isOn;
+    }
+
+    public void ResetLevel()
+    {
+        CurrentMovesCount = 0;
+        movesText.text = "0";
+
+        StartCoroutine(Coroutine());
+
+        IEnumerator Coroutine()
+        {
+            movesText.text = "0";
+            CurrentMovesCount = 0;
+
+            levelUI.SetBool("show", false);
+            SwitchPauseMenu(false);
+
+            if (CurrentMap != null)
+            {
+                MapManager.CurrentMapManager.ClearMap(false);
+
+                yield return new WaitForSeconds(
+                    (MapManager.CurrentMapManager.allCreatedElements.Count * MapManager.CurrentMapManager.destroyElementDelay) + 1f);
+            }
+
+            LoadLevel(defaultMap);
+        }
     }
 
     /// <summary>

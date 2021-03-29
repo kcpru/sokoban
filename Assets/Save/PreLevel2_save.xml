@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
-<SokobanLevel difficulty="Easy" biome="Rock" moves="47">
+<SokobanLevel difficulty="Easy" biome="Rock" moves="91">
   <LevelStructure width="25" height="9">
     <Row>AAAAAAAAAAAAAAAAAAAAAAAAA</Row>
     <Row>AAAAAAAAAAAAAAAAAAAAAAGGA</Row>
     <Row>AAAAAAAAAAAAAAAAGGGGGAGGA</Row>
-    <Row>AAGGTGAGGDGGAGGDBGAGGBGGA</Row>
-    <Row>AGTGAGGGAOAGAGGGGGAGGBBGA</Row>
-    <Row>AGDGBGAGGGGGAAGTAAATGGATA</Row>
+    <Row>AAGGTGAGGDGGAGGDGGAGGBGGA</Row>
+    <Row>AGTGAGGGATAGAGGGGGAGGBBGA</Row>
+    <Row>AGDGBGAGGGGGAAPDAAATGGATA</Row>
     <Row>AGGABAADGGGAAABGAGATAAAAA</Row>
     <Row>AAGGGAAGBAGGGGGTAGAAAAAAA</Row>
     <Row>AAAAAAAAAAAAAAAAAAAAAAAAA</Row>

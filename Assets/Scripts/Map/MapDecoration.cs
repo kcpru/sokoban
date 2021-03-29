@@ -19,6 +19,11 @@ public class MapDecoration : MonoBehaviour
     private List<GameObject> spawnedElements = new List<GameObject>();
 
     /// <summary>
+    /// Indicates whether decorations are spawned.
+    /// </summary>
+    public bool AreDecorationsSpawned => spawnedElements.Count > 0;
+
+    /// <summary>
     /// Spawns random decorations in random positions around map. It uses animation.
     /// </summary>
     /// <param name="biomeType">Biome type used to select decorations.</param>

@@ -172,6 +172,32 @@ public class MainMenu : MonoBehaviour
             newBtn.transform.GetChild(0).GetComponent<TextMeshPro>().text = Path.GetFileName(allAvailableMaps[i]);
             newBtn.transform.GetChild(1).GetComponent<TextMeshPro>().text = File.GetLastAccessTime(allAvailableMaps[i]).ToString();
 
+            newBtn.GetComponent<Button3D>().OnClick.AddListener((sender) =>
+            {
+                StartCoroutine(Coroutine());
+
+                IEnumerator Coroutine()
+                {
+                    camAnim.SetInteger("view", LEVEL);
+                    camAnim.SetTrigger("switch");
+
+                    yield return new WaitForSeconds(0.5f);
+
+                    module1.SetActive(false);
+                    module2.SetActive(false);
+                    module3.SetActive(false);
+                    credits.SetActive(false);
+
+                    camAnim.enabled = false;
+
+                    MapSerializer serializer = 
+                    new MapSerializer(MapEditor.PathToMapsDir + "/" + sender.transform.GetChild(0).GetComponent<TextMeshPro>().text);
+                    Map deserializedMap = serializer.Deserialize();
+
+                    mapEditor.InitializeEditor(deserializedMap);
+                }
+            });
+
             module3MapButtons.Add(newBtn);
         }
     }
@@ -198,11 +224,11 @@ public class MainMenu : MonoBehaviour
 
                 if (bestResult != null)
                 {
-                    obj.transform.GetChild(0).GetComponent<TMPro.TextMeshPro>().text += $" <size=\"1\"><b>{((RankingManager.Record)bestResult).points.ToString()}</b></size>";
+                    obj.transform.GetChild(0).GetComponent<TextMeshPro>().text += $" <size=\"1\"><b>{((RankingManager.Record)bestResult).points.ToString()}</b></size>";
                 }
                 else
                 {
-                    obj.transform.GetChild(0).GetComponent<TMPro.TextMeshPro>().text += " <size=\"1\"><b>0</b></size>";
+                    obj.transform.GetChild(0).GetComponent<TextMeshPro>().text += " <size=\"1\"><b>0</b></size>";
                 }
 
                 Button3D btn = obj.GetComponent<Button3D>();

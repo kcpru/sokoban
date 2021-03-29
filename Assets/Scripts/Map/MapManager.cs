@@ -83,7 +83,12 @@ public class MapManager : MonoBehaviour
     /// <summary>
     /// Clears currently spawned map.
     /// </summary>
-    public void ClearMap() => StartCoroutine(ClearMapCoroutine());
+    public void ClearMap(bool removeDecorations) => StartCoroutine(ClearMapCoroutine(removeDecorations));
+
+    /// <summary>
+    /// Clears currently spawned map and removes all decorations around map.
+    /// </summary>
+    public void ClearMap() => StartCoroutine(ClearMapCoroutine(true));
 
     private IEnumerator CreateMapCoroutine(Map mapToLoad)
     {
@@ -147,7 +152,8 @@ public class MapManager : MonoBehaviour
             pos = new Vector3(0, 0, -pos.z);
         }
 
-        mapDecorator.SpawnDecoration(Biomes.Grass, currentMap.mapSize, 5, 1, false);
+        if (!mapDecorator.AreDecorationsSpawned)
+            mapDecorator.SpawnDecoration(Biomes.Grass, currentMap.mapSize, 5, 1, false);
 
         if (!skipCreateAnimation)
             yield return new WaitForSeconds(1f);
@@ -155,7 +161,7 @@ public class MapManager : MonoBehaviour
         CanMove = true;
     }
 
-    private IEnumerator ClearMapCoroutine()
+    private IEnumerator ClearMapCoroutine(bool removeDecorations)
     {
         CanMove = false;
 
@@ -165,7 +171,9 @@ public class MapManager : MonoBehaviour
             yield return new WaitForSeconds(destroyElementDelay);
         }
 
-        mapDecorator.ClearSpawnedDecorations();
+        if (removeDecorations)
+            mapDecorator.ClearSpawnedDecorations();
+
         allCreatedElements.Clear();
         currentMap = null;
         currentElements = null;
