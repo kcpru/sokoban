@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using TMPro;
 
 public class MainMenu : MonoBehaviour
 {
@@ -19,6 +21,8 @@ public class MainMenu : MonoBehaviour
 
     [Header("Module 3")]
     [SerializeField] private MapEditor mapEditor;
+    [SerializeField] private GameObject module3MapButton;
+    private List<GameObject> module3MapButtons = new List<GameObject>();
 
     public const int MAIN_MENU = 0;
     public const int BOTTOM_1 = 1;
@@ -105,6 +109,8 @@ public class MainMenu : MonoBehaviour
                 module2.SetActive(false);
                 module3.SetActive(true);
                 credits.SetActive(false);
+                ModuleNumber = 3;
+                LoadModule3();
                 break;
             case 4:
                 camAnim.SetInteger("view", BOTTOM_1);
@@ -146,6 +152,28 @@ public class MainMenu : MonoBehaviour
     {
         spawnModule2ButtonsCor = InstantiateButtons();
         StartCoroutine(spawnModule2ButtonsCor);
+    }
+
+    private void LoadModule3()
+    {
+        module3MapButtons.ForEach(item => Destroy(item));
+        module3MapButtons.Clear();
+
+        string[] allAvailableMaps = MapEditor.GetAllMapsPaths();
+
+        for(int i = 0; i < allAvailableMaps.Length; i++)
+        {
+            Vector3 pos = new Vector3(4f, 9.7f - (i * 0.6f), 0f);
+            GameObject newBtn = Instantiate(module3MapButton);
+            newBtn.transform.SetParent(module3.transform);
+            newBtn.transform.localPosition = pos;
+            newBtn.transform.rotation = Quaternion.identity;
+
+            newBtn.transform.GetChild(0).GetComponent<TextMeshPro>().text = Path.GetFileName(allAvailableMaps[i]);
+            newBtn.transform.GetChild(1).GetComponent<TextMeshPro>().text = File.GetLastAccessTime(allAvailableMaps[i]).ToString();
+
+            module3MapButtons.Add(newBtn);
+        }
     }
 
     IEnumerator InstantiateButtons()
@@ -312,7 +340,11 @@ public class MainMenu : MonoBehaviour
             credits.SetActive(false);
 
             camAnim.enabled = false;
-            mapEditor.InitializeEditor(new Vector2Int(12, 8));
+
+            MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/PreLevel1.xml");
+            Map deserializedMap = serializer.Deserialize();
+
+            mapEditor.InitializeEditor(deserializedMap);
         }
     }
 

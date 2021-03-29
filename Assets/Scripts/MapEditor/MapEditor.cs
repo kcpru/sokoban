@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 public class MapEditor : MonoBehaviour
 {
     [Header("Misc")]
     [SerializeField] private Camera cam;
     [SerializeField] private Animator editorUI;
+    [SerializeField] private MapEditorErrorMsg errorMsg;
 
     [Header("Objects")]
     [SerializeField] private GameObject gridField;
@@ -18,35 +20,73 @@ public class MapEditor : MonoBehaviour
     private Transform GridRoot => transform.GetChild(0);
     private Transform MapElementsRoot => transform.GetChild(1);
 
+    private GameObject[] allButtons;
+    private bool isPlayer = false;
+
     public ElementType CurrentlySelectedElement { get; private set; } = ElementType.Ground;
     public bool IsDeleting { get; private set; } = false;
 
     public static bool IsEditor { get; private set; } = false;
+    public static string PathToMapsDir => Path.Combine(Application.dataPath, "MyMaps");
+
+    private void Start()
+    {
+        allButtons = new GameObject[editorUI.transform.GetChild(0).GetChild(0).childCount];
+        for (int i = 0; i < allButtons.Length; i++)
+            allButtons[i] = editorUI.transform.GetChild(0).GetChild(0).GetChild(i).gameObject;
+    }
 
     public void InitializeEditor(Vector2Int gridSize)
     {
-        IsEditor = true;
-
-        int max = gridSize.x > gridSize.y ? gridSize.x : gridSize.y;
-        cam.transform.position = new Vector3((gridSize.x / 2f) - 1f, max * 0.625f, -gridSize.y - 1f);
-        cam.transform.LookAt(new Vector3(gridSize.x / 2f, 0f, gridSize.y * -0.5f));
-        cam.transform.eulerAngles = new Vector3(cam.transform.eulerAngles.x + 5f, 0f, 0f);
-        cam.GetComponent<MapEditorCamera>().ActivateController(gridSize);
-
-        editorUI.SetBool("show", true);
-        CreateGrid(gridSize);
-
-        elements = new List<GameObject>[gridSize.y, gridSize.x];
-        elementTypes = new ElementType[gridSize.y, gridSize.x];
+        ElementType[,] elements = new ElementType[gridSize.y, gridSize.x];
 
         for(int y = 0; y < gridSize.y; y++)
         {
-            for(int x = 0; x < gridSize.x; x++)
+            for (int x = 0; x < gridSize.x; x++)
+                elements[y, x] = ElementType.Air;
+        }
+
+        InitializeEditor(new Map("new map", elements));
+    }
+
+    public void InitializeEditor(Map mapToLoad)
+    {
+        if (!Directory.Exists(PathToMapsDir))
+            Directory.CreateDirectory(PathToMapsDir);
+
+        IsEditor = true;
+
+        int max = mapToLoad.mapSize.x > mapToLoad.mapSize.y ? mapToLoad.mapSize.x : mapToLoad.mapSize.y;
+        cam.transform.position = new Vector3((mapToLoad.mapSize.x / 2f) - 1f, max * 0.625f, -mapToLoad.mapSize.y - 1f);
+        cam.transform.LookAt(new Vector3(mapToLoad.mapSize.x / 2f, 0f, mapToLoad.mapSize.y * -0.5f));
+        cam.transform.eulerAngles = new Vector3(cam.transform.eulerAngles.x + 5f, 0f, 0f);
+        cam.GetComponent<MapEditorCamera>().ActivateController(mapToLoad.mapSize);
+
+        editorUI.SetBool("show", true);
+        CreateGrid(mapToLoad.mapSize);
+
+        elements = new List<GameObject>[mapToLoad.mapSize.y, mapToLoad.mapSize.x];
+        elementTypes = new ElementType[mapToLoad.mapSize.y, mapToLoad.mapSize.x];
+
+        for (int y = 0; y < mapToLoad.mapSize.y; y++)
+        {
+            for (int x = 0; x < mapToLoad.mapSize.x; x++)
+                elementTypes[y, x] = ElementType.Air;
+        }
+
+        for (int y = 0; y < mapToLoad.mapSize.y; y++)
+        {
+            for(int x = 0; x < mapToLoad.mapSize.x; x++)
             {
                 elements[y, x] = new List<GameObject>();
-                elementTypes[y, x] = ElementType.Air;
+                
+                SelectElement(mapToLoad.mapDefinition[y, x]);
+                PlaceElement(new Vector3(x, 0f, -y));
             }
         }
+
+        LevelManager.CurrentManager.SetBackgroundColor(mapToLoad.biomeType);
+        SelectElement(allButtons[2].GetComponent<Button3D>());
     }
 
     private void CreateGrid(Vector2Int gridSize)
@@ -68,7 +108,12 @@ public class MapEditor : MonoBehaviour
 
     public void SelectElement(MonoBehaviour sender)
     {
-        if(sender.name == "Delete")
+        foreach (GameObject btn in allButtons)
+            btn.transform.localScale = Vector3.one;
+
+        sender.transform.localScale = sender.transform.localScale * 1.2f;
+
+        if (sender.name == "Delete")
         {
             IsDeleting = true;
             return;
@@ -79,12 +124,18 @@ public class MapEditor : MonoBehaviour
         }
 
         ElementType elementType = (ElementType)System.Enum.Parse(typeof(ElementType), sender.name);
-        CurrentlySelectedElement = elementType;
+        SelectElement(elementType);
     }
+
+    public void SelectElement(ElementType elementType) => CurrentlySelectedElement = elementType;
 
     public void PlaceElement(Vector3 pos)
     {
-        print(elementTypes[Mathf.Abs((int)pos.z), Mathf.Abs((int)pos.x)].ToString());
+        if(isPlayer && (CurrentlySelectedElement == ElementType.Player || CurrentlySelectedElement == ElementType.PlayerOnTarget) && !IsDeleting)
+        {
+            errorMsg.SetText("Cannot place more than one player element!", 4f);
+            return;
+        }
 
         if (IsDeleting)
         {
@@ -96,8 +147,10 @@ public class MapEditor : MonoBehaviour
             return;
         }
 
-        if (elementTypes[Mathf.Abs((int)pos.z), Mathf.Abs((int)pos.x)] == CurrentlySelectedElement)
+        if (elementTypes[Mathf.Abs((int)pos.z), Mathf.Abs((int)pos.x)] == CurrentlySelectedElement || CurrentlySelectedElement == ElementType.Air)
+        {
             return;
+        }
 
         if (elements[Mathf.Abs((int)pos.z), Mathf.Abs((int)pos.x)].Count > 0)
         {
@@ -152,10 +205,34 @@ public class MapEditor : MonoBehaviour
         elementTypes[Mathf.Abs((int)pos.z), Mathf.Abs((int)pos.x)] = CurrentlySelectedElement;
 
         Destroy(newElem.GetComponent<Collider>());
+
+        if (CurrentlySelectedElement == ElementType.Player || CurrentlySelectedElement == ElementType.PlayerOnTarget)
+            isPlayer = true;
+
+        print("p");
+    }
+
+    public static string[] GetAllMapsPaths()
+    {
+        if (!Directory.Exists(PathToMapsDir)) return null;
+
+        string[] allFiles = Directory.GetFiles(PathToMapsDir);
+        List<string> xmlFiles = new List<string>();
+
+        foreach(string file in allFiles)
+        {
+            if (Path.GetExtension(file) == ".xml")
+                xmlFiles.Add(file);
+        }
+
+        return xmlFiles.ToArray();
     }
 
     private void RemoveAllElementsFromArray(int x, int y)
     {
+        if (elementTypes[y, x] == ElementType.Player || elementTypes[y, x] == ElementType.PlayerOnTarget)
+            isPlayer = false;
+
         elementTypes[y, x] = ElementType.Air;
 
         foreach(GameObject obj in elements[y, x])

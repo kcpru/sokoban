@@ -147,7 +147,7 @@ public class MapManager : MonoBehaviour
             pos = new Vector3(0, 0, -pos.z);
         }
 
-        mapDecorator.SpawnDecoration(Biomes.Grass, currentMap.mapSize, 5, 1);
+        mapDecorator.SpawnDecoration(Biomes.Grass, currentMap.mapSize, 5, 1, false);
 
         if (!skipCreateAnimation)
             yield return new WaitForSeconds(1f);
