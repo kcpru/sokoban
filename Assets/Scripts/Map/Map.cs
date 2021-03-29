@@ -63,7 +63,7 @@ public class Map
 
         if(!ValidateBoxes(ref map))
         {
-            Debug.LogError("Count of boxes has to equal count of targets!");
+            Debug.LogError("Count of boxes has to equal count of targets and must at least one");
             return;
         }
 
@@ -89,11 +89,9 @@ public class Map
 
         if (!ValidateBoxes(ref map))
         {
-            Debug.LogError("Count of boxes has to equal count of targets!");
+            Debug.LogError("Count of boxes has to equal count of targets and must at least one!");
             return;
         }
-
-
 
         this.name = name;
         this.difficulty = difficulty;
@@ -173,34 +171,14 @@ public class Map
             }
         }
 
-        if (boxesCount == targetsCount)
-            return true;
-        else
-            return false;
-    }
-
-    /// <summary>
-    /// Checks whether count of targets and boxes are more than 0.
-    /// </summary>
-    public static bool ValidateTargets(ref ElementType[,] map)
-    {
-        int boxesCount = 0, targetsCount = 0;
-
-        for (int i = 0; i < map.GetLength(0); i++)
+        if (boxesCount != targetsCount)
         {
-            for (int j = 0; j < map.GetLength(1); j++)
-            {
-                if (map[i, j] == ElementType.Box)
-                    boxesCount++;
-
-                if (map[i, j] == ElementType.Target)
-                    targetsCount++;
-            }
-        }
-
-        if (boxesCount == 0 || targetsCount == 0 || boxesCount != targetsCount)
             return false;
+        }
         else
-            return true;
+        {
+            return boxesCount > 0 ? true : false;
+        }
     }
+
 }
