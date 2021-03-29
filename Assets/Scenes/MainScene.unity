@@ -6871,6 +6871,75 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!1 &1743559301
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1743559303}
+  - component: {fileID: 1743559302}
+  m_Layer: 0
+  m_Name: MapElementsManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1743559302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1743559301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55000185ca6f52449a76306c3330f661, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapElementsSets:
+  - biome: 0
+    playerElement: {fileID: 1743900402929335938, guid: ef5328b16ba8bae41880747f19ce7fd1, type: 3}
+    boxElement: {fileID: 522781261045507288, guid: 7e4db5f726d89704b88ca7e75e7bb5ce, type: 3}
+    groundElement: {fileID: 4234973135102999844, guid: ea040cbcfd4516f44a5853bd5217d4ca, type: 3}
+    targetElement: {fileID: 4550523989604564219, guid: 86310dace8b1080418790d3d6f9f5275, type: 3}
+  - biome: 1
+    playerElement: {fileID: 1743900402929335938, guid: ef5328b16ba8bae41880747f19ce7fd1, type: 3}
+    boxElement: {fileID: 522781261045507288, guid: 7e4db5f726d89704b88ca7e75e7bb5ce, type: 3}
+    groundElement: {fileID: 4234973135102999844, guid: ea040cbcfd4516f44a5853bd5217d4ca, type: 3}
+    targetElement: {fileID: 4550523989604564219, guid: 86310dace8b1080418790d3d6f9f5275, type: 3}
+  - biome: 2
+    playerElement: {fileID: 1743900402929335938, guid: ef5328b16ba8bae41880747f19ce7fd1, type: 3}
+    boxElement: {fileID: 522781261045507288, guid: 7e4db5f726d89704b88ca7e75e7bb5ce, type: 3}
+    groundElement: {fileID: 4234973135102999844, guid: ea040cbcfd4516f44a5853bd5217d4ca, type: 3}
+    targetElement: {fileID: 4550523989604564219, guid: 86310dace8b1080418790d3d6f9f5275, type: 3}
+  - biome: 3
+    playerElement: {fileID: 1743900402929335938, guid: ef5328b16ba8bae41880747f19ce7fd1, type: 3}
+    boxElement: {fileID: 522781261045507288, guid: 7e4db5f726d89704b88ca7e75e7bb5ce, type: 3}
+    groundElement: {fileID: 4234973135102999844, guid: ea040cbcfd4516f44a5853bd5217d4ca, type: 3}
+    targetElement: {fileID: 4550523989604564219, guid: 86310dace8b1080418790d3d6f9f5275, type: 3}
+  - biome: 4
+    playerElement: {fileID: 1743900402929335938, guid: ef5328b16ba8bae41880747f19ce7fd1, type: 3}
+    boxElement: {fileID: 522781261045507288, guid: 7e4db5f726d89704b88ca7e75e7bb5ce, type: 3}
+    groundElement: {fileID: 4234973135102999844, guid: ea040cbcfd4516f44a5853bd5217d4ca, type: 3}
+    targetElement: {fileID: 4550523989604564219, guid: 86310dace8b1080418790d3d6f9f5275, type: 3}
+--- !u!4 &1743559303
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1743559301}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.3200002, y: -0.2044816, z: 11.656986}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1778323255
 GameObject:
   m_ObjectHideFlags: 0

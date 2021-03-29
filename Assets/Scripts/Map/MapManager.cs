@@ -12,12 +12,8 @@ public class MapManager : MonoBehaviour
     [SerializeField] private float moveSpeed = 7f;
 
     [Header("Map elements")]
-    [SerializeField] private GameObject playerElement;
-    [SerializeField] private GameObject targetElement;
-    [SerializeField] private GameObject groundElement;
-    [SerializeField] private GameObject boxElement;
-                     public Material boxMaterial;
-                     public Material targetDoneMaterial;
+    public Material boxMaterial;
+    public Material targetDoneMaterial;
 
     [Header("Map creation settings")]
     [SerializeField] private bool skipCreateAnimation = false;
@@ -103,7 +99,7 @@ public class MapManager : MonoBehaviour
             for (int x = 0; x < currentMap.mapSize.x; x++)
             {
                 ElementType elementType = currentMap.mapDefinition[y, x];
-                GameObject elementToSpawn = GetMapElement(elementType);
+                GameObject elementToSpawn = MapElementsManager.CurrentManager.GetMapElement(elementType, currentMap.biomeType);
 
                 if (elementToSpawn != null)
                 {
@@ -118,14 +114,14 @@ public class MapManager : MonoBehaviour
 
                     if (elementType != ElementType.Ground && elementType != ElementType.Air && elementType != ElementType.Target)
                     {
-                        newElem = Instantiate(groundElement, new Vector3(pos.x, 0f, -y), Quaternion.identity, MapRoot);
+                        newElem = Instantiate(MapElementsManager.CurrentManager.GetMapElement(ElementType.Ground, currentMap.biomeType), new Vector3(pos.x, 0f, -y), Quaternion.identity, MapRoot);
                         StartCoroutine(NewElementAnimation(newElem.transform));
                         allCreatedElements.Add(newElem);
                     }
 
                     if(elementType == ElementType.DoneTarget || elementType == ElementType.PlayerOnTarget)
                     {
-                        newElem = Instantiate(targetElement, new Vector3(pos.x, 0f, -y), Quaternion.identity, MapRoot);
+                        newElem = Instantiate(MapElementsManager.CurrentManager.GetMapElement(ElementType.Target, currentMap.biomeType), new Vector3(pos.x, 0f, -y), Quaternion.identity, MapRoot);
                         StartCoroutine(NewElementAnimation(newElem.transform));
                         allCreatedElements.Add(newElem);
                     }
@@ -330,37 +326,4 @@ public class MapManager : MonoBehaviour
     /// Returns type of map element at given position.
     /// </summary>
     public ElementType GetElementType(int x, int y) => GetElementType(new Vector2Int(x, y));
-
-    /// <summary>
-    /// Returns <seealso cref="GameObject"/> that fits to given <seealso cref="ElementType"/>.
-    /// </summary>
-    /// <param name="type">Type of element to return</param>
-    /// <returns></returns>
-    public GameObject GetMapElement(ElementType type)
-    {
-        GameObject element = null;
-
-        switch (type)
-        {
-            case ElementType.Ground:
-                element = groundElement;
-                break;
-            case ElementType.Player:
-            case ElementType.PlayerOnTarget:
-                element = playerElement;
-                break;
-            case ElementType.Air:
-                element = null;
-                break;
-            case ElementType.Box:
-            case ElementType.DoneTarget:
-                element = boxElement;
-                break;
-            case ElementType.Target:
-                element = targetElement;
-                break;
-        }
-
-        return element;
-    }
 }

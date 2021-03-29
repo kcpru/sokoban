@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-using System.Collections;
 
 public class MapEditor : MonoBehaviour
 {
@@ -297,7 +296,7 @@ public class MapEditor : MonoBehaviour
         if (CurrentlySelectedElement != ElementType.Ground && CurrentlySelectedElement != ElementType.Air && CurrentlySelectedElement != ElementType.Target)
         {
             newElem = 
-                Instantiate(MapManager.CurrentMapManager.GetMapElement(ElementType.Ground), new Vector3(pos.x, 0f, pos.z), Quaternion.identity, MapElementsRoot);
+                Instantiate(MapElementsManager.CurrentManager.GetMapElement(ElementType.Ground, biomeType), new Vector3(pos.x, 0f, pos.z), Quaternion.identity, MapElementsRoot);
             elements[Mathf.Abs((int)pos.z), Mathf.Abs((int)pos.x)].Add(newElem);
             Destroy(newElem.GetComponent<Collider>());
         }
@@ -305,7 +304,7 @@ public class MapEditor : MonoBehaviour
         if (CurrentlySelectedElement == ElementType.DoneTarget || CurrentlySelectedElement == ElementType.PlayerOnTarget)
         {
             newElem = 
-                Instantiate(MapManager.CurrentMapManager.GetMapElement(ElementType.Target), new Vector3(pos.x, 0f, pos.z), Quaternion.identity, MapElementsRoot);
+                Instantiate(MapElementsManager.CurrentManager.GetMapElement(ElementType.Target, biomeType), new Vector3(pos.x, 0f, pos.z), Quaternion.identity, MapElementsRoot);
             elements[Mathf.Abs((int)pos.z), Mathf.Abs((int)pos.x)].Add(newElem);
             Destroy(newElem.GetComponent<Collider>());
         }
@@ -313,8 +312,7 @@ public class MapEditor : MonoBehaviour
         if (newElem != null)
             Destroy(newElem.GetComponent<Collider>());
 
-        newElem = Instantiate(MapManager.CurrentMapManager.GetMapElement(
-                CurrentlySelectedElement), new Vector3(pos.x, yPos, pos.z), Quaternion.identity, MapElementsRoot);
+        newElem = Instantiate(MapElementsManager.CurrentManager.GetMapElement(CurrentlySelectedElement, biomeType), new Vector3(pos.x, yPos, pos.z), Quaternion.identity, MapElementsRoot);
 
         if(CurrentlySelectedElement == ElementType.PlayerOnTarget)
         {
