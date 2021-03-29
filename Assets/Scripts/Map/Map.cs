@@ -16,6 +16,12 @@ public class Map
     /// </summary>
     public bool IsMapDefined => mapDefinition != null;
 
+    public const int MIN_X = 4;
+    public const int MAX_X = 30;
+
+    public const int MIN_Y = 4;
+    public const int MAX_Y = 20;
+
     /// <summary>
     /// Returns true if all goals are done, means they have boxes on themselves.
     /// </summary>
@@ -61,8 +67,8 @@ public class Map
             return;
         }
 
-        mapDefinition = map;
         this.name = name;
+        mapDefinition = (ElementType[,])map.Clone();
     }
 
     /// <summary>
@@ -87,10 +93,10 @@ public class Map
             return;
         }
 
-        mapDefinition = map;
         this.name = name;
         this.difficulty = difficulty;
         this.biomeType = biomeType;
+        mapDefinition = (ElementType[,])map.Clone();
     }
 
     /// <summary>

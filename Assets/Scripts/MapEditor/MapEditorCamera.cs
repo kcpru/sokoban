@@ -13,6 +13,10 @@ public class MapEditorCamera : MonoBehaviour
     private float xCamPos = 0f, zCamPos = 0f;
     private float xCamMin, xCamMax, zCamMin, zCamMax;
 
+    [Header("Scale")]
+    [SerializeField] private float scaleSpeed = 2f;
+    private float scaleMin, scaleMax, scale = 0f;
+
     public bool IsActivated { get; private set; } = false;
 
     public void ActivateController(Vector2Int gridSize)
@@ -26,6 +30,10 @@ public class MapEditorCamera : MonoBehaviour
         xCamMax = transform.position.x + (gridSize.x * 0.6f);
         zCamMin = transform.position.z;
         zCamMax = transform.position.z + (gridSize.y * 0.85f);
+
+        scaleMin = transform.position.y * 0.5f;
+        scaleMax = transform.position.y * 1.25f;
+        scale = transform.position.y;
 
         IsActivated = true;
     }
@@ -59,6 +67,10 @@ public class MapEditorCamera : MonoBehaviour
 
                 transform.position = new Vector3(xCamPos, transform.position.y, zCamPos);
             }
+
+            scale += scaleSpeed * -Input.GetAxis("Mouse ScrollWheel");
+            scale = Mathf.Clamp(scale, scaleMin, scaleMax);
+            transform.position = new Vector3(transform.position.x, scale, transform.position.z);
         }
     }
 }

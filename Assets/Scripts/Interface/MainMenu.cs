@@ -169,10 +169,12 @@ public class MainMenu : MonoBehaviour
             newBtn.transform.localPosition = pos;
             newBtn.transform.rotation = Quaternion.identity;
 
-            newBtn.transform.GetChild(0).GetComponent<TextMeshPro>().text = Path.GetFileName(allAvailableMaps[i]);
-            newBtn.transform.GetChild(1).GetComponent<TextMeshPro>().text = File.GetLastAccessTime(allAvailableMaps[i]).ToString();
+            newBtn.transform.GetChild(3).GetComponent<TextMeshPro>().text = Path.GetFileName(allAvailableMaps[i]);
+            newBtn.transform.GetChild(4).GetComponent<TextMeshPro>().text = File.GetLastAccessTime(allAvailableMaps[i]).ToString();
 
-            newBtn.GetComponent<Button3D>().OnClick.AddListener((sender) =>
+            string path = MapEditor.PathToMapsDir + "/" + newBtn.transform.GetChild(1).transform.parent.GetChild(3).GetComponent<TextMeshPro>().text;
+
+            newBtn.transform.GetChild(1).GetComponent<Button3D>().OnClick.AddListener((sender) =>
             {
                 StartCoroutine(Coroutine());
 
@@ -183,19 +185,91 @@ public class MainMenu : MonoBehaviour
 
                     yield return new WaitForSeconds(0.5f);
 
-                    module1.SetActive(false);
-                    module2.SetActive(false);
                     module3.SetActive(false);
-                    credits.SetActive(false);
 
-                    camAnim.enabled = false;
-
+                    camAnim.enabled = false;             
+ 
                     MapSerializer serializer = 
-                    new MapSerializer(MapEditor.PathToMapsDir + "/" + sender.transform.GetChild(0).GetComponent<TextMeshPro>().text);
+                        new MapSerializer(MapEditor.PathToMapsDir + "/" + sender.transform.parent.GetChild(3).GetComponent<TextMeshPro>().text);
                     Map deserializedMap = serializer.Deserialize();
 
-                    mapEditor.InitializeEditor(deserializedMap);
+                    mapEditor.InitializeEditor(deserializedMap, path);
                 }
+            });
+
+            newBtn.transform.GetChild(0).GetComponent<Button3D>().OnClick.AddListener((sender) =>
+            {
+                MapSerializer serializer = new MapSerializer(path);
+                Map deserializedMap = serializer.Deserialize();
+
+                module3.SetActive(false);
+                module2Info.SetActive(true);
+
+                RankingManager.Record[] records = RankingManager.GetRecords(deserializedMap.name);
+                TextMeshPro text = module2Info.transform.GetChild(2).GetComponent<TextMeshPro>();
+                text.text = "";
+
+                foreach (RankingManager.Record r in records)
+                {
+                    text.text += $"Points: <b>{r.points.ToString()} | </b>Count of moves: <b>{r.moves.ToString()}</b> | Date: <b>{r.date.ToShortDateString()} {r.date.ToShortTimeString()}</b>\n";
+                }
+
+                Button3D playBtn = module2Info.transform.GetChild(4).GetComponent<Button3D>();
+                Button3D playSavedBtn = module2Info.transform.GetChild(5).GetComponent<Button3D>();
+
+                playSavedBtn.isClickable = SaveLoadManager.SaveExists(deserializedMap);
+
+                playSavedBtn.OnClick.RemoveAllListeners();
+
+                if (playSavedBtn.isClickable)
+                {
+                    playSavedBtn.OnClick.AddListener(s =>
+                    {
+                        Map progressedMap = SaveLoadManager.LoadLevelProgress(deserializedMap, out int movesCount);
+
+                        StartCoroutine(Coroutine());
+
+                        IEnumerator Coroutine()
+                        {
+                            camAnim.SetInteger("view", LEVEL);
+                            camAnim.SetTrigger("switch");
+
+                            yield return new WaitForSeconds(0.5f);
+
+                            module3.SetActive(false);
+                            module2Info.SetActive(false);
+
+                            camAnim.enabled = false;
+
+                            LevelManager.CurrentManager.SetBackgroundColor(progressedMap.biomeType);
+                            LevelManager.CurrentManager.LoadLevel(progressedMap, movesCount);
+                        }
+                    });
+                }
+
+                playBtn.OnClick.RemoveAllListeners();
+                playBtn.OnClick.AddListener(s =>
+                {
+                    SaveLoadManager.ClearSave(deserializedMap);
+
+                    StartCoroutine(Coroutine());
+
+                    IEnumerator Coroutine()
+                    {
+                        camAnim.SetInteger("view", LEVEL);
+                        camAnim.SetTrigger("switch");
+
+                        yield return new WaitForSeconds(0.5f);
+
+                        module3.SetActive(false);
+                        module2Info.SetActive(false);
+
+                        camAnim.enabled = false;
+
+                        LevelManager.CurrentManager.SetBackgroundColor(deserializedMap.biomeType);
+                        LevelManager.CurrentManager.LoadLevel(deserializedMap);
+                    }
+                });
             });
 
             module3MapButtons.Add(newBtn);
@@ -244,7 +318,7 @@ public class MainMenu : MonoBehaviour
                     currentLevelModule2 = sender.name;
 
                     RankingManager.Record[] records = RankingManager.GetRecords(currentLevelModule2);
-                    TMPro.TextMeshPro text = module2Info.transform.GetChild(2).GetComponent<TMPro.TextMeshPro>();
+                    TextMeshPro text = module2Info.transform.GetChild(2).GetComponent<TextMeshPro>();
                     text.text = "";
 
                     foreach (RankingManager.Record r in records)
@@ -287,10 +361,8 @@ public class MainMenu : MonoBehaviour
 
                                 spawnedMapButtons.Clear();
 
-                                module1.SetActive(false);
                                 module2.SetActive(false);
-                                module3.SetActive(false);
-                                credits.SetActive(false);
+                                module2Info.SetActive(false);
 
                                 camAnim.enabled = false;
 
@@ -327,10 +399,8 @@ public class MainMenu : MonoBehaviour
 
                             spawnedMapButtons.Clear();
 
-                            module1.SetActive(false);
                             module2.SetActive(false);
-                            module3.SetActive(false);
-                            credits.SetActive(false);
+                            module2Info.SetActive(false);
 
                             camAnim.enabled = false;
 
@@ -367,10 +437,7 @@ public class MainMenu : MonoBehaviour
 
             camAnim.enabled = false;
 
-            MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/PreLevel1.xml");
-            Map deserializedMap = serializer.Deserialize();
-
-            mapEditor.InitializeEditor(deserializedMap);
+            mapEditor.InitializeEditor(Vector2Int.one * 6);
         }
     }
 
@@ -393,7 +460,11 @@ public class MainMenu : MonoBehaviour
 
     public void CloseModule2LevelInfo()
     {
-        module2Levels.SetActive(true);
+        if (ModuleNumber == 2)
+            module2Levels.SetActive(true);
+        else
+            module3.SetActive(true);
+
         module2Info.SetActive(false);
     }
 }

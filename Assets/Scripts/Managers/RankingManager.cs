@@ -114,6 +114,30 @@ public static class RankingManager
     }
 
     /// <summary>
+    /// Removes all records linked with the map with given name.
+    /// </summary>
+    public static void RemoveAllRecords(string mapName)
+    {
+        if (!File.Exists(PathToRankFile)) return;
+
+        XmlDocument doc = new XmlDocument();
+        doc.Load(PathToRankFile);
+
+        XmlNode rootNode = doc.SelectSingleNode("Ranking");
+        XmlNodeList records = rootNode.SelectNodes("Record");
+
+        for (int i = 0; i < records.Count; i++)
+        {
+            if (records[i].Attributes.GetNamedItem("map").Value.Trim() == mapName)
+            {
+                doc.SelectSingleNode("Ranking").RemoveChild(records[i]);
+            }
+        }
+
+        doc.Save(PathToRankFile);
+    }
+
+    /// <summary>
     /// If directory or file in which ranking is stored don't exist, then creates them and additionaly prepares xml file.
     /// </summary>
     private static void PrepareFile()

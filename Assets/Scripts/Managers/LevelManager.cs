@@ -96,7 +96,7 @@ public class LevelManager : MonoBehaviour
                 SaveRecord();
 
                 RankingManager.Record[] records = RankingManager.GetRecords(CurrentMap.name);
-                TextMeshPro text = MainMenu.ModuleNumber == 2 ? winScreenModule2.transform.GetChild(0).GetChild(0).GetComponent<TextMeshPro>() :
+                TextMeshPro text = MainMenu.ModuleNumber == 2 || MainMenu.ModuleNumber == 3 ? winScreenModule2.transform.GetChild(0).GetChild(0).GetComponent<TextMeshPro>() :
                     winScreenModule1.transform.GetChild(0).GetChild(0).GetComponent<TextMeshPro>();
                 text.text = "";
 
@@ -112,7 +112,7 @@ public class LevelManager : MonoBehaviour
 
                 if (MainMenu.ModuleNumber == 1)
                     winScreenModule1.SetBool("show", true);
-                else if (MainMenu.ModuleNumber == 2)
+                else if (MainMenu.ModuleNumber == 2 || MainMenu.ModuleNumber == 3)
                     winScreenModule2.SetBool("show", true);
 
                 cam.transform.rotation = Quaternion.identity;
@@ -236,7 +236,7 @@ public class LevelManager : MonoBehaviour
 
         movesText.text = CurrentMovesCount.ToString();
     }
-
+    
     /// <summary>
     /// Sets camera background color fits to given <seealso cref="Biomes"/>
     /// </summary>

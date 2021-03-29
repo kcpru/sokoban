@@ -1,14 +1,15 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System.Collections;
 
 public class MapEditor : MonoBehaviour
 {
     [Header("Misc")]
     [SerializeField] private Camera cam;
     [SerializeField] private Animator editorUI;
-    [SerializeField] private MapEditorErrorMsg errorMsg;
+    [SerializeField] private MapEditorMsg msg;
+    [SerializeField] private MainMenu mainMenu;
 
     [Header("Objects")]
     [SerializeField] private GameObject gridField;
@@ -16,12 +17,18 @@ public class MapEditor : MonoBehaviour
     private GameObject[,] grid;
     private List<GameObject>[,] elements;
     private ElementType[,] elementTypes;
+    private Vector2Int mapSize;
+    private Biomes biomeType;
+    private Difficulty difficulty;
+    private string mapName;
+    private string mapPath;
 
     private Transform GridRoot => transform.GetChild(0);
     private Transform MapElementsRoot => transform.GetChild(1);
 
     private GameObject[] allButtons;
     private bool isPlayer = false;
+    private InputField3D nameField;
 
     public ElementType CurrentlySelectedElement { get; private set; } = ElementType.Ground;
     public bool IsDeleting { get; private set; } = false;
@@ -32,6 +39,9 @@ public class MapEditor : MonoBehaviour
     private void Start()
     {
         allButtons = new GameObject[editorUI.transform.GetChild(0).GetChild(0).childCount];
+        nameField = editorUI.transform.GetChild(0).GetChild(9).GetComponent<InputField3D>();
+        nameField.OnValueChanged.AddListener(InputFieldChanged);
+
         for (int i = 0; i < allButtons.Length; i++)
             allButtons[i] = editorUI.transform.GetChild(0).GetChild(0).GetChild(i).gameObject;
     }
@@ -46,47 +56,87 @@ public class MapEditor : MonoBehaviour
                 elements[y, x] = ElementType.Air;
         }
 
-        InitializeEditor(new Map("new map", elements));
+        InitializeEditor(new Map("new map", elements), mapPath);
     }
 
-    public void InitializeEditor(Map mapToLoad)
+    public void InitializeEditor(ElementType[,] mapDefinition, Vector2Int mapSize, Biomes biomeType, Difficulty difficulty, string mapName)
     {
         if (!Directory.Exists(PathToMapsDir))
             Directory.CreateDirectory(PathToMapsDir);
 
         IsEditor = true;
+        this.mapSize = mapSize;
+        this.mapName = mapName;
+        nameField.SetValue(mapName);
 
-        int max = mapToLoad.mapSize.x > mapToLoad.mapSize.y ? mapToLoad.mapSize.x : mapToLoad.mapSize.y;
-        cam.transform.position = new Vector3((mapToLoad.mapSize.x / 2f) - 1f, max * 0.625f, -mapToLoad.mapSize.y - 1f);
-        cam.transform.LookAt(new Vector3(mapToLoad.mapSize.x / 2f, 0f, mapToLoad.mapSize.y * -0.5f));
-        cam.transform.eulerAngles = new Vector3(cam.transform.eulerAngles.x + 5f, 0f, 0f);
-        cam.GetComponent<MapEditorCamera>().ActivateController(mapToLoad.mapSize);
+        CameraSettings();
 
         editorUI.SetBool("show", true);
-        CreateGrid(mapToLoad.mapSize);
+        CreateGrid(mapSize);
 
-        elements = new List<GameObject>[mapToLoad.mapSize.y, mapToLoad.mapSize.x];
-        elementTypes = new ElementType[mapToLoad.mapSize.y, mapToLoad.mapSize.x];
+        elements = new List<GameObject>[mapSize.y, mapSize.x];
+        elementTypes = new ElementType[mapSize.y, mapSize.x];
 
-        for (int y = 0; y < mapToLoad.mapSize.y; y++)
+        for (int y = 0; y < mapSize.y; y++)
         {
-            for (int x = 0; x < mapToLoad.mapSize.x; x++)
+            for (int x = 0; x < mapSize.x; x++)
                 elementTypes[y, x] = ElementType.Air;
         }
 
-        for (int y = 0; y < mapToLoad.mapSize.y; y++)
+        for (int y = 0; y < mapSize.y; y++)
         {
-            for(int x = 0; x < mapToLoad.mapSize.x; x++)
+            for (int x = 0; x < mapSize.x; x++)
             {
                 elements[y, x] = new List<GameObject>();
-                
-                SelectElement(mapToLoad.mapDefinition[y, x]);
+
+                SelectElement(mapDefinition[y, x]);
                 PlaceElement(new Vector3(x, 0f, -y));
             }
         }
 
-        LevelManager.CurrentManager.SetBackgroundColor(mapToLoad.biomeType);
+        LevelManager.CurrentManager.SetBackgroundColor(biomeType);
         SelectElement(allButtons[2].GetComponent<Button3D>());
+    }
+
+    public void InitializeEditor(Map mapToLoad, string path)
+    {
+        mapPath = path;
+        InitializeEditor(mapToLoad.mapDefinition, mapToLoad.mapSize, mapToLoad.biomeType, mapToLoad.difficulty, mapToLoad.name);
+    }
+
+    private void ResizeGrid(Vector2Int newSize)
+    {
+        ClearElements();
+        ClearGrid();
+
+        ElementType[,] oldElements = elementTypes;
+        ElementType[,] elements = new ElementType[newSize.y, newSize.x];
+
+        for (int y = 0; y < newSize.y; y++)
+        {
+            for (int x = 0; x < newSize.x; x++)
+            {
+                if (y < oldElements.GetLength(0) && x < oldElements.GetLength(1))
+                {
+                    elements[y, x] = oldElements[y, x];
+                }
+                else
+                {
+                    elements[y, x] = ElementType.Air;
+                }
+            }
+        }
+
+        for (int y = 0; y < mapSize.y; y++)
+        {
+            for (int x = 0; x < mapSize.x; x++)
+            {
+                elementTypes[y, x] = ElementType.Air;
+            }
+        }
+
+        isPlayer = false;
+        InitializeEditor(elements, newSize, biomeType, Difficulty.Easy, mapName);
     }
 
     private void CreateGrid(Vector2Int gridSize)
@@ -103,6 +153,82 @@ public class MapEditor : MonoBehaviour
                 grid[y, x] = Instantiate(gridField, pos, Quaternion.identity, GridRoot);
                 grid[y, x].GetComponent<GridField>().OnClick.AddListener((position) => PlaceElement(position));
             }
+        }
+    }
+
+    private void ClearGrid()
+    {
+        if (!IsEditor) return;
+
+        for (int y = 0; y < mapSize.y; y++)
+        {
+            for (int x = 0; x < mapSize.x; x++)
+            {
+                Destroy(grid[y, x]);
+            }
+        }
+    }
+
+    private void ClearElements()
+    {
+        for (int y = 0; y < mapSize.y; y++)
+        {
+            for (int x = 0; x < mapSize.x; x++)
+            {
+                foreach(GameObject obj in elements[y, x])
+                {
+                    Destroy(obj);
+                }
+
+                elements[y, x].Clear();
+            }
+        }
+    }
+
+    public void BackToMenu()
+    {
+        editorUI.SetBool("show", false);
+        ClearGrid();
+        ClearElements();
+        cam.transform.rotation = Quaternion.identity;
+        LevelManager.CurrentManager.SetMainMenuBackgroundColor();
+        Animator camAnim = cam.GetComponent<Animator>();
+        camAnim.enabled = true;
+        mainMenu.OpenPage(MainMenu.ModuleNumber == 2 ? 2 : 0);
+        camAnim.SetTrigger("switch");
+
+        elementTypes = new ElementType[0, 0];
+        elements = new List<GameObject>[0, 0];
+        mapSize = Vector2Int.zero;
+        isPlayer = false;
+        mapName = string.Empty;
+        mapPath = string.Empty;
+    }
+
+    public void SaveMap()
+    {
+        if(mapName.Length == 0 || mapName.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
+        {
+            msg.SetText("Map name is not correct!", 4f, Color.red);
+            return;
+        }
+
+        mapPath = PathToMapsDir + "/" + Path.GetFileNameWithoutExtension(mapName) + ".xml";
+
+        Map map = new Map(mapName, elementTypes, biomeType, difficulty);
+
+        if (map.IsMapDefined)
+        {
+            MapSerializer mapSerializer = new MapSerializer(mapPath);
+            mapSerializer.Serialize(map);
+            msg.SetText($"Saved map correctly in: {mapPath}", 6f, Color.green);
+
+            RankingManager.RemoveAllRecords(map.name);
+            SaveLoadManager.ClearSave(map);
+        }
+        else
+        {
+            msg.SetText("Cannot save this map due to some problems!", 4f, Color.red);
         }
     }
 
@@ -133,7 +259,7 @@ public class MapEditor : MonoBehaviour
     {
         if(isPlayer && (CurrentlySelectedElement == ElementType.Player || CurrentlySelectedElement == ElementType.PlayerOnTarget) && !IsDeleting)
         {
-            errorMsg.SetText("Cannot place more than one player element!", 4f);
+            msg.SetText("Cannot place more than one player element!", 4f, Color.red);
             return;
         }
 
@@ -141,7 +267,7 @@ public class MapEditor : MonoBehaviour
         {
             if (elements[Mathf.Abs((int)pos.z), Mathf.Abs((int)pos.x)].Count > 0)
             {
-                RemoveAllElementsFromArray(Mathf.Abs((int)pos.x), Mathf.Abs((int)pos.z));
+                RemoveAllElementsFromList(Mathf.Abs((int)pos.x), Mathf.Abs((int)pos.z));
             }
 
             return;
@@ -154,7 +280,7 @@ public class MapEditor : MonoBehaviour
 
         if (elements[Mathf.Abs((int)pos.z), Mathf.Abs((int)pos.x)].Count > 0)
         {
-            RemoveAllElementsFromArray(Mathf.Abs((int)pos.x), Mathf.Abs((int)pos.z));
+            RemoveAllElementsFromList(Mathf.Abs((int)pos.x), Mathf.Abs((int)pos.z));
             PlaceElement(pos);
             return;
         }
@@ -208,8 +334,15 @@ public class MapEditor : MonoBehaviour
 
         if (CurrentlySelectedElement == ElementType.Player || CurrentlySelectedElement == ElementType.PlayerOnTarget)
             isPlayer = true;
+    }
 
-        print("p");
+    private void CameraSettings()
+    {
+        int max = mapSize.x > mapSize.y ? mapSize.x : mapSize.y;
+        cam.transform.position = new Vector3((mapSize.x / 2f) - 1f, max * 0.625f, -mapSize.y - 1f);
+        cam.transform.LookAt(new Vector3(mapSize.x / 2f, 0f, mapSize.y * -0.5f));
+        cam.transform.eulerAngles = new Vector3(cam.transform.eulerAngles.x + 5f, 0f, 0f);
+        cam.GetComponent<MapEditorCamera>().ActivateController(mapSize);
     }
 
     public static string[] GetAllMapsPaths()
@@ -228,7 +361,7 @@ public class MapEditor : MonoBehaviour
         return xmlFiles.ToArray();
     }
 
-    private void RemoveAllElementsFromArray(int x, int y)
+    private void RemoveAllElementsFromList(int x, int y)
     {
         if (elementTypes[y, x] == ElementType.Player || elementTypes[y, x] == ElementType.PlayerOnTarget)
             isPlayer = false;
@@ -242,4 +375,41 @@ public class MapEditor : MonoBehaviour
 
         elements[y, x].Clear();
     }
+
+    public void SwitchBiome()
+    {
+        Biomes[] arr = (Biomes[])System.Enum.GetValues(typeof(Biomes));
+        int j = System.Array.IndexOf(arr, biomeType) + 1;
+        Biomes nextBiome = (arr.Length == j) ? arr[0] : arr[j];
+        biomeType = nextBiome;
+        LevelManager.CurrentManager.SetBackgroundColor(biomeType);
+    }
+
+    public void InputFieldChanged(MonoBehaviour sender) => mapName = nameField.value;
+
+    #region Resize grid buttons
+    public void AddX()
+    {
+        if (mapSize.x + 1 <= Map.MAX_X)
+            ResizeGrid(new Vector2Int(mapSize.x + 1, mapSize.y));
+    }
+
+    public void RemoveX()
+    {
+        if (mapSize.x - 1 >= Map.MIN_X)
+            ResizeGrid(new Vector2Int(mapSize.x - 1, mapSize.y));
+    }
+
+    public void AddY()
+    {
+        if (mapSize.y + 1 <= Map.MAX_Y)
+            ResizeGrid(new Vector2Int(mapSize.x, mapSize.y + 1));
+    }
+
+    public void RemoveY()
+    {
+        if (mapSize.y - 1 >= Map.MIN_Y)
+            ResizeGrid(new Vector2Int(mapSize.x, mapSize.y - 1));
+    }
+    #endregion
 }

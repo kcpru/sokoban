@@ -43,6 +43,8 @@ public class MapManager : MonoBehaviour
     {
         get
         {
+            if(currentMap == null) return Vector2Int.zero;
+
             for (int y = 0; y < currentMap.mapSize.y; y++)
             {
                 for (int x = 0; x < currentMap.mapSize.x; x++)
@@ -153,7 +155,7 @@ public class MapManager : MonoBehaviour
         }
 
         if (!mapDecorator.AreDecorationsSpawned)
-            mapDecorator.SpawnDecoration(Biomes.Grass, currentMap.mapSize, 5, 1, false);
+            mapDecorator.SpawnDecoration(Biomes.Grass, currentMap.mapSize, 4, 0, false);
 
         if (!skipCreateAnimation)
             yield return new WaitForSeconds(1f);

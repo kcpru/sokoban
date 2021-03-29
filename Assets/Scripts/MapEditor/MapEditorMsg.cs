@@ -2,20 +2,21 @@ using UnityEngine;
 using TMPro;
 using System.Collections;
 
-public class MapEditorErrorMsg : MonoBehaviour
+public class MapEditorMsg : MonoBehaviour
 {
     private TextMeshPro textObj;
     private IEnumerator coroutine;
 
     private void Start() => textObj = GetComponent<TextMeshPro>();
 
-    public void SetText(string text, float time)
+    public void SetText(string text, float time, Color color)
     {
         if(coroutine != null)
         {
             StopCoroutine(coroutine);
         }
 
+        textObj.color = color;
         coroutine = DisplayMessage(text, time);
         StartCoroutine(coroutine);
     }

@@ -33,8 +33,6 @@ public class MapDecoration : MonoBehaviour
     /// <param name="createBottomDecoration">Indicates whether create decorations at bottom of map.</param>
     public void SpawnDecoration(Biomes biomeType, Vector2Int mapSize, int radius, int border = 0, bool createBottomDecoration = true)
     {
-        if ((radius + border) % 2 == 1) radius--;
-
         mapSize = new Vector2Int(mapSize.x + border, mapSize.y + border);
 
         Vector3 pos;
