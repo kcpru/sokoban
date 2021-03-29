@@ -272,6 +272,12 @@ public class MainMenu : MonoBehaviour
                 });
             });
 
+            newBtn.transform.GetChild(2).GetComponent<Button3D>().OnClick.AddListener((sender) =>
+            {
+                File.Delete(MapEditor.PathToMapsDir + "/" + sender.transform.parent.GetChild(3).GetComponent<TextMeshPro>().text);
+                LoadModule3();
+            });
+
             module3MapButtons.Add(newBtn);
         }
     }
