@@ -237,16 +237,16 @@ public class MapManager : MonoBehaviour
                 StartCoroutine(SmoothMoveElement(Player.transform, new Vector3(newPos.x, 1f, -newPos.y)));
                 StartCoroutine(SmoothMoveElement(currentElements[newPos.y, newPos.x].transform, new Vector3(newBoxPos.x, 1f, -newBoxPos.y)));
 
-                if (GetElementType(newBoxPos) == ElementType.Target)
-                {
-                    Debug.Log("<color=green>ENTER TARGET</color>");
-                    currentElements[newPos.y, newPos.x].GetComponent<Box>().EnterTarget();
-                }
-
                 if(GetElementType(newPos) == ElementType.DoneTarget)
                 {
                     Debug.Log("<color=red>EXIT TARGET</color>");
                     currentElements[newPos.y, newPos.x].GetComponent<Box>().ExitTarget();
+                }
+
+                if (GetElementType(newBoxPos) == ElementType.Target)
+                {
+                    Debug.Log("<color=green>ENTER TARGET</color>");
+                    currentElements[newPos.y, newPos.x].GetComponent<Box>().EnterTarget();
                 }
 
                 currentMap.mapDefinition[oldPlayerPos.y, oldPlayerPos.x] = 

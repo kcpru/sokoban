@@ -7,7 +7,6 @@ using UnityEngine;
 /// </summary>
 public class MapDecoration : MonoBehaviour
 {
-    [SerializeField] private float eachElementDelay = 0.01f;
     [SerializeField] private float spawnAnimationSpeed = 7.5f;
     [SerializeField] private Vector2Int maxElementSize;
     [SerializeField] private GameObject[] grassBiomeObjects;

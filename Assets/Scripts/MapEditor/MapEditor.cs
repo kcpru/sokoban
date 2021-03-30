@@ -26,6 +26,7 @@ public class MapEditor : MonoBehaviour
     private Transform MapElementsRoot => transform.GetChild(1);
 
     private GameObject[] allButtons;
+    private GameObject[] buttonsRoots;
     private bool isPlayer = false;
     private InputField3D nameField;
 
@@ -37,12 +38,21 @@ public class MapEditor : MonoBehaviour
 
     private void Start()
     {
-        allButtons = new GameObject[editorUI.transform.GetChild(0).GetChild(0).childCount];
-        nameField = editorUI.transform.GetChild(0).GetChild(9).GetComponent<InputField3D>();
+        allButtons = new GameObject[editorUI.transform.GetChild(0).GetChild(0).childCount * 5];
+        buttonsRoots = new GameObject[5];
+        nameField = editorUI.transform.GetChild(0).GetChild(13).GetComponent<InputField3D>();
         nameField.OnValueChanged.AddListener(InputFieldChanged);
+        int index = 0;
 
-        for (int i = 0; i < allButtons.Length; i++)
-            allButtons[i] = editorUI.transform.GetChild(0).GetChild(0).GetChild(i).gameObject;
+        for (int j = 0; j < 5; j++)
+        {
+            buttonsRoots[j] = editorUI.transform.GetChild(0).GetChild(j).gameObject;
+            for (int i = 0; i < allButtons.Length / 5; i++)
+            {
+                allButtons[index] = editorUI.transform.GetChild(0).GetChild(j).GetChild(i).gameObject;
+                index++;
+            }
+        }
     }
 
     public void InitializeEditor(Vector2Int gridSize)
@@ -95,6 +105,8 @@ public class MapEditor : MonoBehaviour
 
         LevelManager.CurrentManager.SetBackgroundColor(biomeType);
         SelectElement(allButtons[2].GetComponent<Button3D>());
+        this.biomeType = biomeType;
+        SetButtons();
     }
 
     public void InitializeEditor(Map mapToLoad, string path)
@@ -324,6 +336,8 @@ public class MapEditor : MonoBehaviour
 
         if(CurrentlySelectedElement == ElementType.DoneTarget)
         {
+            print(newElem.name);
+            newElem.transform.GetChild(1).localScale = Vector3.one * 0.8f;
             newElem.GetComponent<Box>().EnterTarget();
         }
 
@@ -383,8 +397,42 @@ public class MapEditor : MonoBehaviour
         Biomes nextBiome = (arr.Length == j) ? arr[0] : arr[j];
         biomeType = nextBiome;
         LevelManager.CurrentManager.SetBackgroundColor(biomeType);
+        ResizeGrid(mapSize);
     }
 
+    private void SetButtons()
+    {
+        foreach (GameObject go in buttonsRoots)
+        {
+            print(go.name);
+            go.SetActive(false);
+        }
+
+        switch (biomeType)
+        {
+            case Biomes.Grass:
+                buttonsRoots[0].SetActive(true);
+                SelectElement(buttonsRoots[0].transform.GetChild(2).GetComponent<Button3D>());
+                break;
+            case Biomes.Desert:
+                buttonsRoots[1].SetActive(true);
+                SelectElement(buttonsRoots[1].transform.GetChild(2).GetComponent<Button3D>());
+                break;
+            case Biomes.Winter:
+                buttonsRoots[2].SetActive(true);
+                SelectElement(buttonsRoots[2].transform.GetChild(2).GetComponent<Button3D>());
+                break;
+            case Biomes.Rock:
+                buttonsRoots[3].SetActive(true);
+                SelectElement(buttonsRoots[3].transform.GetChild(2).GetComponent<Button3D>());
+                break;
+            case Biomes.Lava:
+                buttonsRoots[4].SetActive(true);
+                SelectElement(buttonsRoots[4].transform.GetChild(2).GetComponent<Button3D>());
+                break;
+        }
+    }
+    
     public void InputFieldChanged(MonoBehaviour sender) => mapName = nameField.value;
 
     #region Resize grid buttons
