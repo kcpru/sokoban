@@ -381,7 +381,7 @@ public class MapEditor : MonoBehaviour
 
     public static string[] GetAllMapsPaths()
     {
-        if (!Directory.Exists(PathToMapsDir)) return null;
+        if (!Directory.Exists(PathToMapsDir)) return new string[0];
 
         string[] allFiles = Directory.GetFiles(PathToMapsDir);
         List<string> xmlFiles = new List<string>();
