@@ -214,6 +214,8 @@ public class MainMenu : MonoBehaviour
                     text.text += $"Points: <b>{r.points.ToString()} | </b>Count of moves: <b>{r.moves.ToString()}</b> | Date: <b>{r.date.ToShortDateString()} {r.date.ToShortTimeString()}</b>\n";
                 }
 
+                SetMapIcon(path);
+                
                 Button3D playBtn = module2Info.transform.GetChild(4).GetComponent<Button3D>();
                 Button3D playSavedBtn = module2Info.transform.GetChild(5).GetComponent<Button3D>();
 
@@ -326,6 +328,8 @@ public class MainMenu : MonoBehaviour
                     RankingManager.Record[] records = RankingManager.GetRecords(currentLevelModule2);
                     TextMeshPro text = module2Info.transform.GetChild(2).GetComponent<TextMeshPro>();
                     text.text = "";
+
+                    SetMapIcon(MapSerializer.MapsPath + "/" + sender.name + ".xml");
 
                     foreach (RankingManager.Record r in records)
                     {
@@ -445,6 +449,26 @@ public class MainMenu : MonoBehaviour
 
             mapEditor.InitializeEditor(Vector2Int.one * 6);
         }
+    }
+
+    private void SetMapIcon(string path)
+    {
+        string iconPath = Screenshotter.GetMapIconPath(path);
+
+        GameObject display = module2Info.transform.GetChild(0).gameObject;
+        MeshRenderer renderer = display.GetComponent<MeshRenderer>();
+        Material mat = new Material(Shader.Find("Legacy Shaders/Diffuse"));
+
+        if (File.Exists(iconPath))
+        {
+            Texture2D texture = new Texture2D(Screenshotter.SIZE_X, Screenshotter.SIZE_Y, TextureFormat.RGB24, false);
+            byte[] bytes = File.ReadAllBytes(iconPath);
+            texture.LoadImage(bytes, false);
+            texture.Apply();
+            mat.mainTexture = texture;
+        }
+
+        renderer.material = mat;
     }
 
     /// <summary>

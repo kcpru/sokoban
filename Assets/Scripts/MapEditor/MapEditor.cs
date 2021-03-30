@@ -19,8 +19,8 @@ public class MapEditor : MonoBehaviour
     private Vector2Int mapSize;
     private Biomes biomeType;
     private Difficulty difficulty;
-    private string mapName;
-    private string mapPath;
+    private string mapName = "";
+    private string mapPath = "";
 
     private Transform GridRoot => transform.GetChild(0);
     private Transform MapElementsRoot => transform.GetChild(1);
@@ -65,7 +65,7 @@ public class MapEditor : MonoBehaviour
                 elements[y, x] = ElementType.Air;
         }
 
-        InitializeEditor(new Map("new map", elements), mapPath);
+        InitializeEditor(elements, gridSize, biomeType, difficulty, mapPath);
     }
 
     public void InitializeEditor(ElementType[,] mapDefinition, Vector2Int mapSize, Biomes biomeType, Difficulty difficulty, string mapName)
@@ -76,6 +76,7 @@ public class MapEditor : MonoBehaviour
         IsEditor = true;
         this.mapSize = mapSize;
         this.mapName = mapName;
+        this.biomeType = biomeType;
         nameField.SetValue(mapName);
 
         CameraSettings();
@@ -105,7 +106,6 @@ public class MapEditor : MonoBehaviour
 
         LevelManager.CurrentManager.SetBackgroundColor(biomeType);
         SelectElement(allButtons[2].GetComponent<Button3D>());
-        this.biomeType = biomeType;
         SetButtons();
     }
 
@@ -236,6 +236,8 @@ public class MapEditor : MonoBehaviour
             mapSerializer.Serialize(map);
             msg.SetText($"Saved map correctly in: {mapPath}", 6f, Color.green);
 
+            MakeMapMiniature();
+
             RankingManager.RemoveAllRecords(map.name);
             SaveLoadManager.ClearSave(map);
         }
@@ -270,7 +272,9 @@ public class MapEditor : MonoBehaviour
 
     public void PlaceElement(Vector3 pos)
     {
-        if(isPlayer && (CurrentlySelectedElement == ElementType.Player || CurrentlySelectedElement == ElementType.PlayerOnTarget) && !IsDeleting)
+        Collider[] colliders = new Collider[0];
+
+        if (isPlayer && (CurrentlySelectedElement == ElementType.Player || CurrentlySelectedElement == ElementType.PlayerOnTarget) && !IsDeleting)
         {
             msg.SetText("Cannot place more than one player element!", 4f, Color.red);
             return;
@@ -315,28 +319,33 @@ public class MapEditor : MonoBehaviour
             Destroy(newElem.GetComponent<Collider>());
         }
 
+        if (newElem != null)
+        {
+            colliders = newElem.GetComponentsInChildren<Collider>();
+            foreach (Collider c in colliders)
+                Destroy(c);
+            colliders = new Collider[0];
+        }
+
         if (CurrentlySelectedElement == ElementType.DoneTarget || CurrentlySelectedElement == ElementType.PlayerOnTarget)
         {
             newElem = 
                 Instantiate(MapElementsManager.CurrentManager.GetMapElement(ElementType.Target, biomeType), new Vector3(pos.x, 0f, pos.z), Quaternion.identity, MapElementsRoot);
             elements[Mathf.Abs((int)pos.z), Mathf.Abs((int)pos.x)].Add(newElem);
-            Destroy(newElem.GetComponent<Collider>());
         }
 
         if (newElem != null)
-            Destroy(newElem.GetComponent<Collider>());
+        {
+            colliders = newElem.GetComponentsInChildren<Collider>();
+            foreach (Collider c in colliders)
+                Destroy(c);
+            colliders = new Collider[0];
+        }
 
         newElem = Instantiate(MapElementsManager.CurrentManager.GetMapElement(CurrentlySelectedElement, biomeType), new Vector3(pos.x, yPos, pos.z), Quaternion.identity, MapElementsRoot);
 
-        if(CurrentlySelectedElement == ElementType.PlayerOnTarget)
-        {
-            Color c = newElem.GetComponent<Renderer>().material.color;
-            newElem.GetComponent<Renderer>().material.color = new Color(c.r, c.g, c.b, 0.825f);
-        }
-
         if(CurrentlySelectedElement == ElementType.DoneTarget)
         {
-            print(newElem.name);
             newElem.transform.GetChild(1).localScale = Vector3.one * 0.8f;
             newElem.GetComponent<Box>().EnterTarget();
         }
@@ -344,7 +353,9 @@ public class MapEditor : MonoBehaviour
         elements[Mathf.Abs((int)pos.z), Mathf.Abs((int)pos.x)].Add(newElem);
         elementTypes[Mathf.Abs((int)pos.z), Mathf.Abs((int)pos.x)] = CurrentlySelectedElement;
 
-        Destroy(newElem.GetComponent<Collider>());
+        colliders = newElem.GetComponentsInChildren<Collider>();
+        foreach (Collider c in colliders)
+            Destroy(c);
 
         if (CurrentlySelectedElement == ElementType.Player || CurrentlySelectedElement == ElementType.PlayerOnTarget)
             isPlayer = true;
@@ -357,6 +368,15 @@ public class MapEditor : MonoBehaviour
         cam.transform.LookAt(new Vector3(mapSize.x / 2f, 0f, mapSize.y * -0.5f));
         cam.transform.eulerAngles = new Vector3(cam.transform.eulerAngles.x + 5f, 0f, 0f);
         cam.GetComponent<MapEditorCamera>().ActivateController(mapSize);
+    }
+
+    private void MakeMapMiniature()
+    {
+        CameraSettings();
+
+        cam.transform.GetChild(0).GetComponent<Camera>().enabled = false;
+        Screenshotter.TakeScreenshot(Screenshotter.GetMapIconPath(mapPath), cam);
+        cam.transform.GetChild(0).GetComponent<Camera>().enabled = true;
     }
 
     public static string[] GetAllMapsPaths()
