@@ -30,64 +30,52 @@ public class MapDecoration : MonoBehaviour
     /// <param name="radius">Radius in which objects will be spawned.</param>
     /// <param name="border">Border around map in which objects won't be spawned.</param>
     /// <param name="createBottomDecoration">Indicates whether create decorations at bottom of map.</param>
-    public void SpawnDecoration(Biomes biomeType, Vector2Int mapSize, int radius, int border = 0, bool createBottomDecoration = true)
+    public void SpawnDecoration(Biomes biomeType, Vector2Int mapSize, int countOfElements)
     {
-        mapSize = new Vector2Int(mapSize.x + border, mapSize.y + border);
-
         Vector3 pos;
 
         // TOP
-        for (int y = 0; y < radius; y += maxElementSize.y)
+        for (int y = 0; y < countOfElements; y++)
         {
-            pos = new Vector3(-radius - border, 0f, -y + radius + border);
+            pos = new Vector3(-countOfElements * maxElementSize.x, 0f, ((y + 1) * maxElementSize.y) + (maxElementSize.y * 0.75f));
+            pos = new Vector3(Random.Range(pos.x - 1, pos.x + 1), pos.y, pos.z);
 
-            for (int x = 0; x < mapSize.x + (radius * 2); x += maxElementSize.x)
+            for (int x = 0; x < (countOfElements * 2) + (mapSize.x / 2); x+=2)
             {
                 spawnedElements.Add(Instantiate(GetRandomElement(biomeType), pos, Quaternion.identity));
                 spawnedElements[spawnedElements.Count - 1].transform.localScale = Vector3.zero;
-                pos += new Vector3(maxElementSize.x, 0, 0);
+                pos += new Vector3(maxElementSize.x * 2.25f, 0, 0);
+                pos = new Vector3(Random.Range(pos.x - 1, pos.x + 1), pos.y, pos.z);
             }
         }
 
         // LEFT
-        for (int y = 0; y < mapSize.y; y += maxElementSize.y)
+        for (int y = 0; y < countOfElements; y++)
         {
-            pos = new Vector3(-radius - border, 0f, -y);
+            pos = new Vector3(-maxElementSize.x - (maxElementSize.x * 0.75f), 0f, -y * maxElementSize.y);
+            pos = new Vector3(Random.Range(pos.x - 1, pos.x + 1), pos.y, pos.z);
 
-            for (int x = 0; x < radius; x += maxElementSize.x)
+            for (int x = 0; x < countOfElements; x += 2)
             {
                 spawnedElements.Add(Instantiate(GetRandomElement(biomeType), pos, Quaternion.identity));
                 spawnedElements[spawnedElements.Count - 1].transform.localScale = Vector3.zero;
-                pos += new Vector3(maxElementSize.x, 0, 0);
+                pos -= new Vector3(maxElementSize.x * 4f, 0, 0);
+                pos = new Vector3(Random.Range(pos.x - 1, pos.x + 1), pos.y, pos.z);
             }
         }
 
         // RIGHT
-        for (int y = 0; y < mapSize.y; y += maxElementSize.y)
+        for (int y = 0; y < countOfElements; y++)
         {
-            pos = new Vector3(mapSize.x, 0f, -y);
+            pos = new Vector3(mapSize.x + (maxElementSize.x * 0.75f), 0f, -y * maxElementSize.y);
+            pos = new Vector3(Random.Range(pos.x - 1, pos.x + 1), pos.y, pos.z);
 
-            for (int x = 0; x < radius; x += maxElementSize.x)
+            for (int x = 0; x < countOfElements; x += 2)
             {
                 spawnedElements.Add(Instantiate(GetRandomElement(biomeType), pos, Quaternion.identity));
                 spawnedElements[spawnedElements.Count - 1].transform.localScale = Vector3.zero;
-                pos += new Vector3(maxElementSize.x, 0, 0);
-            }
-        }
-
-        // BOTTOM
-        if (createBottomDecoration)
-        {
-            for (int y = 0; y < radius; y += maxElementSize.y)
-            {
-                pos = new Vector3(-radius - border, 0f, -mapSize.y - y);
-
-                for (int x = 0; x < mapSize.x + (radius * 2); x += maxElementSize.x)
-                {
-                    spawnedElements.Add(Instantiate(GetRandomElement(biomeType), pos, Quaternion.identity));
-                    spawnedElements[spawnedElements.Count - 1].transform.localScale = Vector3.zero;
-                    pos += new Vector3(maxElementSize.x, 0, 0);
-                }
+                pos += new Vector3(maxElementSize.x * 4f, 0, 0);
+                pos = new Vector3(Random.Range(pos.x - 1, pos.x + 1), pos.y, pos.z);
             }
         }
 
