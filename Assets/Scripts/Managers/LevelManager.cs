@@ -37,7 +37,7 @@ public class LevelManager : MonoBehaviour
     public bool IsPlaying => CurrentMap != null;
     public Map CurrentMap => MapManager.CurrentMapManager.currentMap;
 
-    public int Points // CHUJOWY WZÓR - NOWY TRZEBA ZROBIÆ
+    public int Points
     {
         get
         {

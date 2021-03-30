@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<SokobanLevel difficulty="Easy" biome="Desert" moves="0">
+<SokobanLevel difficulty="Easy" biome="Desert" moves="38">
   <LevelStructure width="8" height="8">
     <Row>GGAAAGGD</Row>
-    <Row>GGPGGGGD</Row>
+    <Row>GGGGPGGD</Row>
     <Row>GGGGGGDA</Row>
     <Row>AAAGGGGA</Row>
     <Row>AGGGGGGA</Row>

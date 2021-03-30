@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using TMPro;
 
+/// <summary>
+/// Class that manages interface in the game.
+/// </summary>
 public class MainMenu : MonoBehaviour
 {
     [Header("Interface")]

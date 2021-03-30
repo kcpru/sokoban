@@ -17,11 +17,15 @@ public class MapSerializer
     /// </summary>
     public MapSerializer(string path) => Path = path;
 
+    /// <summary>
+    /// Maps
+    /// </summary>
     public static string MapsPath => "Maps";
 
     /// <summary>
     /// Returns <seealso cref="Map"/> deserialized from previously given path.
     /// </summary>
+    /// <param name="loadMapFromResources">If you want to read map from Resources, enter true, if you want to read from absolute path, enter false.</param>
     public Map Deserialize(bool loadMapFromResources)
     {
         XmlDocument doc = new XmlDocument();
