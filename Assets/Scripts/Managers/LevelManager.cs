@@ -137,8 +137,8 @@ public class LevelManager : MonoBehaviour
         {
             yield return new WaitForSeconds(1f);
 
-            MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/" + RandomMap(CurrentDifficulty).name + ".xml");
-            Map deserializedMap = serializer.Deserialize();
+            MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/" + RandomMap(CurrentDifficulty).name);
+            Map deserializedMap = serializer.Deserialize(true);
 
             SetBackgroundColor(deserializedMap.biomeType);
             LoadLevel(deserializedMap);

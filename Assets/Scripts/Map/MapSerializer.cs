@@ -17,15 +17,24 @@ public class MapSerializer
     /// </summary>
     public MapSerializer(string path) => Path = path;
 
-    public static string MapsPath => System.IO.Path.Combine(Application.dataPath, "Resources/Maps");
+    public static string MapsPath => "Maps";
 
     /// <summary>
     /// Returns <seealso cref="Map"/> deserialized from previously given path.
     /// </summary>
-    public Map Deserialize()
+    public Map Deserialize(bool loadMapFromResources)
     {
         XmlDocument doc = new XmlDocument();
-        doc.Load(Path);
+
+        if (loadMapFromResources)
+        {
+            doc.LoadXml(Resources.Load<TextAsset>(Path).text);
+        }
+        else
+        {
+            doc.Load(Path);
+        }
+
         XmlNode rootNode = doc.SelectSingleNode("SokobanLevel");
         XmlNodeList rows = rootNode.SelectSingleNode("LevelStructure").SelectNodes("Row");
         ElementType[,] elements;

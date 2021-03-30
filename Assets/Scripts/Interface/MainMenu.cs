@@ -128,8 +128,8 @@ public class MainMenu : MonoBehaviour
 
     private IEnumerator OpenLevelCoroutine(Difficulty difficulty)
     {
-        MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/" + LevelManager.CurrentManager.RandomMap(difficulty).name + ".xml");
-        Map deserializedMap = serializer.Deserialize();
+        MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/" + LevelManager.CurrentManager.RandomMap(difficulty).name);
+        Map deserializedMap = serializer.Deserialize(true);
 
         LevelManager.CurrentManager.SetBackgroundColor(deserializedMap.biomeType);
 
@@ -190,8 +190,8 @@ public class MainMenu : MonoBehaviour
                     camAnim.enabled = false;             
  
                     MapSerializer serializer = 
-                        new MapSerializer(MapEditor.PathToMapsDir + "/" + sender.transform.parent.GetChild(3).GetComponent<TextMeshPro>().text);
-                    Map deserializedMap = serializer.Deserialize();
+                        new MapSerializer(path);
+                    Map deserializedMap = serializer.Deserialize(false);
 
                     mapEditor.InitializeEditor(deserializedMap, path);
                 }
@@ -200,7 +200,7 @@ public class MainMenu : MonoBehaviour
             newBtn.transform.GetChild(0).GetComponent<Button3D>().OnClick.AddListener((sender) =>
             {
                 MapSerializer serializer = new MapSerializer(path);
-                Map deserializedMap = serializer.Deserialize();
+                Map deserializedMap = serializer.Deserialize(false);
 
                 module3.SetActive(false);
                 module2Info.SetActive(true);
@@ -317,8 +317,8 @@ public class MainMenu : MonoBehaviour
 
                 btn.OnClick.AddListener((sender) =>
                 {
-                    MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/" + sender.name + ".xml");
-                    Map deserializedMap = serializer.Deserialize();
+                    MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/" + sender.name);
+                    Map deserializedMap = serializer.Deserialize(true);
 
                     module2Levels.SetActive(false);
                     module2Info.SetActive(true);

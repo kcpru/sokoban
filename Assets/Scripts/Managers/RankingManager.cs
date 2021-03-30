@@ -86,7 +86,7 @@ public static class RankingManager
     /// <returns></returns>
     public static Record[] GetRecords(string mapName)
     {
-        if (!File.Exists(PathToRankFile)) return null;
+        if (!File.Exists(PathToRankFile)) return new Record[0];
 
         XmlDocument doc = new XmlDocument();
         doc.Load(PathToRankFile);
