@@ -185,6 +185,7 @@ public class MapEditor : MonoBehaviour
         }
 
         isPlayer = false;
+        IsDeleting = false;
         InitializeEditor(elements, newSize, biomeType, Difficulty.Easy, mapName);
     }
 
@@ -439,13 +440,12 @@ public class MapEditor : MonoBehaviour
     }
 
     /// <summary>
-    /// Makes screenshot of current map and save it to JPG file.
+    /// Takes screenshot of current map and saves it to JPG file.
     /// </summary>
     private void MakeMapMiniature()
     {
         CameraSettings();
-
-        
+  
         for(int y = 0; y < mapSize.y; y++)
         {
             for (int x = 0; x < mapSize.x; x++)
