@@ -532,10 +532,6 @@ public class MapEditor : MonoBehaviour
                 buttonsRoots[3].SetActive(true);
                 SelectElement(buttonsRoots[3].transform.GetChild(2).GetComponent<Button3D>());
                 break;
-            case Biomes.Lava:
-                buttonsRoots[4].SetActive(true);
-                SelectElement(buttonsRoots[4].transform.GetChild(2).GetComponent<Button3D>());
-                break;
         }
     }
     

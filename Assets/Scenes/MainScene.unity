@@ -2879,7 +2879,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 303bb43c073a86a4f832611035b18bf5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4335,7 +4335,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 303bb43c073a86a4f832611035b18bf5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -7266,7 +7266,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 303bb43c073a86a4f832611035b18bf5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -11194,7 +11194,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 303bb43c073a86a4f832611035b18bf5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -11848,11 +11848,6 @@ MonoBehaviour:
     playerElement: {fileID: 7045255084213601954, guid: 54258f074b367ed4b859236f8de33dca, type: 3}
     boxElement: {fileID: 7045255084213601954, guid: 8b9839e7c73a8804e85967f89108cebe, type: 3}
     groundElement: {fileID: 4149509464078627265, guid: 4c73599671adec14eb1906bb4ce43ab4, type: 3}
-    targetElement: {fileID: 4550523989604564219, guid: 86310dace8b1080418790d3d6f9f5275, type: 3}
-  - biome: 4
-    playerElement: {fileID: 7045255084213601954, guid: 54258f074b367ed4b859236f8de33dca, type: 3}
-    boxElement: {fileID: 7045255084213601954, guid: 8b9839e7c73a8804e85967f89108cebe, type: 3}
-    groundElement: {fileID: 4234973135102999844, guid: ea040cbcfd4516f44a5853bd5217d4ca, type: 3}
     targetElement: {fileID: 4550523989604564219, guid: 86310dace8b1080418790d3d6f9f5275, type: 3}
 --- !u!4 &1743559303
 Transform:
@@ -12777,7 +12772,6 @@ MonoBehaviour:
   desertBiomeColor: {r: 0.6415094, g: 0.50615543, b: 0.28141683, a: 1}
   winterBiomeColor: {r: 0.30562478, g: 0.6415094, b: 0.6415094, a: 1}
   rockBiomeColor: {r: 0.4056604, g: 0.4056604, b: 0.4056604, a: 1}
-  lavaBiomeColor: {r: 0.7075472, g: 0.3923505, b: 0.21693665, a: 1}
   changeColorSpeed: 4
 --- !u!114 &1895123480
 MonoBehaviour:
@@ -12841,22 +12835,6 @@ MonoBehaviour:
   - {fileID: 9181240168380729664, guid: c52d44004da2b3f42b54c78b1ffe10cc, type: 3}
   - {fileID: 9181240168380729664, guid: c84e9d20a2f9d854aa0a6a69949fa20e, type: 3}
   - {fileID: 9181240168380729664, guid: 634a02758e3d0b345a6bd0230b74f3bf, type: 3}
-  lavalBiomeObjects:
-  - {fileID: 1729499208360882813, guid: 6fce3d4d6219b2a478c541c01a337cc3, type: 3}
-  - {fileID: 1729499208360882813, guid: 884b73bcef9ecb8449733b932d3df3ec, type: 3}
-  - {fileID: 1729499208360882813, guid: 7cc423e2fdda4894d8990005609d5af0, type: 3}
-  - {fileID: 1729499208360882813, guid: c3d222bbd875cf74ca8d35ebff3144f3, type: 3}
-  - {fileID: 1729499208360882813, guid: 0a9aa89b06497eb4382980d7fa15c7fe, type: 3}
-  - {fileID: 1729499208360882813, guid: e208f75ff8133e64aadec186bca4ed29, type: 3}
-  - {fileID: 1729499208360882813, guid: ef8bd8f80c5d8fb42aeb8a45567c905c, type: 3}
-  - {fileID: 1729499208360882813, guid: e7be0bd4670ef954c94ff586a2768ecc, type: 3}
-  - {fileID: 1729499208360882813, guid: 3e981eb4aadf6d7479ee6451227600c2, type: 3}
-  - {fileID: 1729499208360882813, guid: 2a993301279282346aa35bf2b4dc21f7, type: 3}
-  - {fileID: 1729499208360882813, guid: d09c7ad511ad77b458a87e8157724bca, type: 3}
-  - {fileID: 1729499208360882813, guid: d23b0e745622830448eda514af56405e, type: 3}
-  - {fileID: 1729499208360882813, guid: d9fabfcb13f4ed1499eb830b0d6dc46e, type: 3}
-  - {fileID: 1729499208360882813, guid: c988a9b5d4bf89f42be23a07fe369243, type: 3}
-  - {fileID: 1729499208360882813, guid: 945ee6a085af0e54ab96898b5264bcea, type: 3}
   rockBiomeObjects:
   - {fileID: 1729499208360882813, guid: 6fce3d4d6219b2a478c541c01a337cc3, type: 3}
   - {fileID: 1729499208360882813, guid: 884b73bcef9ecb8449733b932d3df3ec, type: 3}

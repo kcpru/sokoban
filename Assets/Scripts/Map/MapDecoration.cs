@@ -12,7 +12,6 @@ public class MapDecoration : MonoBehaviour
     [SerializeField] private GameObject[] grassBiomeObjects;
     [SerializeField] private GameObject[] desertBiomeObjects;
     [SerializeField] private GameObject[] winterBiomeObjects;
-    [SerializeField] private GameObject[] lavalBiomeObjects;
     [SerializeField] private GameObject[] rockBiomeObjects;
 
     private List<GameObject> spawnedElements = new List<GameObject>();
@@ -142,9 +141,6 @@ public class MapDecoration : MonoBehaviour
                 break;
             case Biomes.Winter:
                 objectsPool = winterBiomeObjects;
-                break;
-            case Biomes.Lava:
-                objectsPool = lavalBiomeObjects;
                 break;
             case Biomes.Rock:
                 objectsPool = rockBiomeObjects;

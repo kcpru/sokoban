@@ -3,6 +3,5 @@
     Grass,
     Winter,
     Desert,
-    Rock,
-    Lava
+    Rock
 }

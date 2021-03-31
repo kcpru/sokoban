@@ -28,7 +28,6 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private Color desertBiomeColor;
     [SerializeField] private Color winterBiomeColor;
     [SerializeField] private Color rockBiomeColor;
-    [SerializeField] private Color lavaBiomeColor;
     [SerializeField] private float changeColorSpeed = 10f;
 
     public int CurrentMovesCount { get; private set; }
@@ -255,9 +254,6 @@ public class LevelManager : MonoBehaviour
                 break;
             case Biomes.Rock:
                 targetBackgroundColor = rockBiomeColor;
-                break;
-            case Biomes.Lava:
-                targetBackgroundColor = lavaBiomeColor;
                 break;
         }
     }
