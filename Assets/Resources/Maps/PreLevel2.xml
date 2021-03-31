@@ -1,14 +1,9 @@
 <?xml version="1.0"?>
-<SokobanLevel difficulty="Easy" biome="Rock">
-  <LevelStructure width="25" height="9">
-    <Row>AAAAAAAAAAAAAAAAAAAAAAAAA</Row>
-    <Row>AAAAAAAAAAAAAAAAAAAAAAGGA</Row>
-    <Row>AAAAAAAAAAAAAAAAGGGGGAGGA</Row>
-    <Row>AAGGTGAGGTGGAGGDBGAGGBGGA</Row>
-    <Row>AGDGAGGGATAGAGGGGGAGGBBGA</Row>
-    <Row>AGTBGGAGGGBGAAGTAAATGGATA</Row>
-    <Row>AGGABAATBBGAAABGAGATAAAAA</Row>
-    <Row>AAGPGAAGGAGGGGGTAGAAAAAAA</Row>
-    <Row>AAAAAAAAAAAAAAAAAAAAAAAAA</Row>
+<SokobanLevel difficulty="Easy" biome="Winter">
+  <LevelStructure width="4" height="4">
+    <Row>PGAA</Row>
+    <Row>GTAA</Row>
+    <Row>BBGG</Row>
+    <Row>TGGG</Row>
   </LevelStructure>
 </SokobanLevel>

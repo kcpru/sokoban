@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<SokobanLevel difficulty="Easy" biome="Desert">
+  <LevelStructure width="6" height="6">
+    <Row>AAAAAA</Row>
+    <Row>AAAAAA</Row>
+    <Row>TGBGGT</Row>
+    <Row>PBGGAG</Row>
+    <Row>AAAGGG</Row>
+    <Row>AAAAAA</Row>
+  </LevelStructure>
+</SokobanLevel>

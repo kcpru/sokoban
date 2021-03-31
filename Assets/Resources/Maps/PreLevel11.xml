@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<SokobanLevel difficulty="Easy" biome="Grass">
+  <LevelStructure width="6" height="7">
+    <Row>AAGGGA</Row>
+    <Row>TPBGGA</Row>
+    <Row>AAGBTA</Row>
+    <Row>TAABGA</Row>
+    <Row>GAGTGA</Row>
+    <Row>BGDBBT</Row>
+    <Row>GGGGTG</Row>
+  </LevelStructure>
+</SokobanLevel>

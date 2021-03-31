@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<SokobanLevel difficulty="Easy" biome="Desert">
+  <LevelStructure width="15" height="11">
+    <Row>AAAAAAAAGGGAAAA</Row>
+    <Row>AAAAAAAAGABAAGG</Row>
+    <Row>AAAAAAAAGGGGGBG</Row>
+    <Row>AAAAAAAAGAAAGGG</Row>
+    <Row>TTTTGGAAGBGGBAA</Row>
+    <Row>TTTTGGGGBGBBGAA</Row>
+    <Row>TTTTGGAABGGBGPA</Row>
+    <Row>AAAAAAAAGGBGGAA</Row>
+    <Row>AAAAAAAAGBGBGGA</Row>
+    <Row>AAAAAAAAAAGAAGA</Row>
+    <Row>AAAAAAAAAAGGGGA</Row>
+  </LevelStructure>
+</SokobanLevel>

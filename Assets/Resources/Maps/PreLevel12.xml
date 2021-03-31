@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<SokobanLevel difficulty="Easy" biome="Winter">
+  <LevelStructure width="20" height="9">
+    <Row>AAAAGGGAAAAAAAAAAAAA</Row>
+    <Row>AAAABGGAAAAAAAAAAAAA</Row>
+    <Row>AAAAGGBAAAAAAAAAAAAA</Row>
+    <Row>AAGGBGGBGAAAAAAAAAAA</Row>
+    <Row>AAGAGAAAGAAAAAAAAAAA</Row>
+    <Row>GGGAGAAAGAAAAAAAGGTT</Row>
+    <Row>GBGGBGGGGGGGGGGGGGTT</Row>
+    <Row>AAAAGAAAAGAPAAAAGGTT</Row>
+    <Row>AAAAGGGGGGAAAAAAAAAA</Row>
+  </LevelStructure>
+</SokobanLevel>

@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<SokobanLevel difficulty="Easy" biome="Grass">
-  <LevelStructure width="4" height="4">
-    <Row>PGBT</Row>
-    <Row>GGBT</Row>
-    <Row>GGBT</Row>
-    <Row>GGBT</Row>
-  </LevelStructure>
-</SokobanLevel>

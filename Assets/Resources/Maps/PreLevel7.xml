@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <SokobanLevel difficulty="Easy" biome="Grass">
   <LevelStructure width="5" height="5">
-    <Row>GGGGG</Row>
-    <Row>GBGTG</Row>
-    <Row>GAAGA</Row>
-    <Row>GBGOG</Row>
-    <Row>GGGGG</Row>
+    <Row>TGGGT</Row>
+    <Row>GBBBG</Row>
+    <Row>GBPBG</Row>
+    <Row>TBBBT</Row>
+    <Row>TTGTT</Row>
   </LevelStructure>
 </SokobanLevel>
