@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using TMPro;
 
+/// <summary>
+/// Class that manages interface in the game.
+/// </summary>
 public class MainMenu : MonoBehaviour
 {
     [Header("Interface")]
@@ -128,8 +131,8 @@ public class MainMenu : MonoBehaviour
 
     private IEnumerator OpenLevelCoroutine(Difficulty difficulty)
     {
-        MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/" + LevelManager.CurrentManager.RandomMap(difficulty).name + ".xml");
-        Map deserializedMap = serializer.Deserialize();
+        MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/" + LevelManager.CurrentManager.RandomMap(difficulty).name);
+        Map deserializedMap = serializer.Deserialize(true);
 
         LevelManager.CurrentManager.SetBackgroundColor(deserializedMap.biomeType);
 
@@ -190,8 +193,8 @@ public class MainMenu : MonoBehaviour
                     camAnim.enabled = false;             
  
                     MapSerializer serializer = 
-                        new MapSerializer(MapEditor.PathToMapsDir + "/" + sender.transform.parent.GetChild(3).GetComponent<TextMeshPro>().text);
-                    Map deserializedMap = serializer.Deserialize();
+                        new MapSerializer(path);
+                    Map deserializedMap = serializer.Deserialize(false);
 
                     mapEditor.InitializeEditor(deserializedMap, path);
                 }
@@ -200,7 +203,7 @@ public class MainMenu : MonoBehaviour
             newBtn.transform.GetChild(0).GetComponent<Button3D>().OnClick.AddListener((sender) =>
             {
                 MapSerializer serializer = new MapSerializer(path);
-                Map deserializedMap = serializer.Deserialize();
+                Map deserializedMap = serializer.Deserialize(false);
 
                 module3.SetActive(false);
                 module2Info.SetActive(true);
@@ -214,6 +217,8 @@ public class MainMenu : MonoBehaviour
                     text.text += $"Points: <b>{r.points.ToString()} | </b>Count of moves: <b>{r.moves.ToString()}</b> | Date: <b>{r.date.ToShortDateString()} {r.date.ToShortTimeString()}</b>\n";
                 }
 
+                SetMapIcon(path);
+                
                 Button3D playBtn = module2Info.transform.GetChild(4).GetComponent<Button3D>();
                 Button3D playSavedBtn = module2Info.transform.GetChild(5).GetComponent<Button3D>();
 
@@ -315,8 +320,8 @@ public class MainMenu : MonoBehaviour
 
                 btn.OnClick.AddListener((sender) =>
                 {
-                    MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/" + sender.name + ".xml");
-                    Map deserializedMap = serializer.Deserialize();
+                    MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/" + sender.name);
+                    Map deserializedMap = serializer.Deserialize(true);
 
                     module2Levels.SetActive(false);
                     module2Info.SetActive(true);
@@ -326,6 +331,8 @@ public class MainMenu : MonoBehaviour
                     RankingManager.Record[] records = RankingManager.GetRecords(currentLevelModule2);
                     TextMeshPro text = module2Info.transform.GetChild(2).GetComponent<TextMeshPro>();
                     text.text = "";
+
+                    SetMapIcon(MapSerializer.MapsPath + "/" + sender.name + ".xml");
 
                     foreach (RankingManager.Record r in records)
                     {
@@ -445,6 +452,26 @@ public class MainMenu : MonoBehaviour
 
             mapEditor.InitializeEditor(Vector2Int.one * 6);
         }
+    }
+
+    private void SetMapIcon(string path)
+    {
+        string iconPath = Screenshotter.GetMapIconPath(path);
+
+        GameObject display = module2Info.transform.GetChild(0).gameObject;
+        MeshRenderer renderer = display.GetComponent<MeshRenderer>();
+        Material mat = new Material(Shader.Find("Legacy Shaders/Diffuse"));
+
+        if (File.Exists(iconPath))
+        {
+            Texture2D texture = new Texture2D(Screenshotter.SIZE_X, Screenshotter.SIZE_Y, TextureFormat.RGB24, false);
+            byte[] bytes = File.ReadAllBytes(iconPath);
+            texture.LoadImage(bytes, false);
+            texture.Apply();
+            mat.mainTexture = texture;
+        }
+
+        renderer.material = mat;
     }
 
     /// <summary>

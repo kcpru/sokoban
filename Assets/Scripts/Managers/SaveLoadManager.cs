@@ -8,6 +8,7 @@ public static class SaveLoadManager
 
     public static void SaveLevelProgress(Map mapToSave, int movesCount)
     {
+        PrepareDirectory();
         string path = GetPathFromMap(mapToSave);
         MapSerializer serializer = new MapSerializer(path);
         serializer.Serialize(mapToSave);
@@ -34,7 +35,7 @@ public static class SaveLoadManager
         }
 
         MapSerializer serializer = new MapSerializer(path);
-        Map savedProgress = serializer.Deserialize();
+        Map savedProgress = serializer.Deserialize(false);
 
         XmlDocument doc = new XmlDocument();
         doc.Load(path);
@@ -48,6 +49,12 @@ public static class SaveLoadManager
     {
         if(SaveExists(mapToClear))
             File.Delete(GetPathFromMap(mapToClear));
+    }
+
+    private static void PrepareDirectory()
+    {
+        if (!Directory.Exists(PathToSaveFiles))
+            Directory.CreateDirectory(PathToSaveFiles);
     }
 
     public static bool SaveExists(Map mapToCheck) => File.Exists(GetPathFromMap(mapToCheck));

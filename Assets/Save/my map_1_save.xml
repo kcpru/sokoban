@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<SokobanLevel difficulty="Easy" biome="Rock" moves="0">
+  <LevelStructure width="6" height="6">
+    <Row>GDADAD</Row>
+    <Row>GAGAGA</Row>
+    <Row>GGGGAG</Row>
+    <Row>GOGBGG</Row>
+    <Row>GGGGBT</Row>
+    <Row>GAGGAA</Row>
+  </LevelStructure>
+</SokobanLevel>

@@ -147,7 +147,11 @@ public class MapManager : MonoBehaviour
         }
 
         if (!mapDecorator.AreDecorationsSpawned)
-            mapDecorator.SpawnDecoration(Biomes.Grass, currentMap.mapSize, 4, 0, false);
+            mapDecorator.SpawnDecoration(
+                mapToLoad.biomeType, 
+                currentMap.mapSize, 
+                ((currentMap.mapSize.x > currentMap.mapSize.y ? currentMap.mapSize.x : currentMap.mapSize.y) / 2) + 1
+                );
 
         if (!skipCreateAnimation)
             yield return new WaitForSeconds(1f);

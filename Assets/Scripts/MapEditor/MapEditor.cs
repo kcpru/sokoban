@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
+/// <summary>
+/// Map editor allows to create own maps, save them and then play on them.
+/// </summary>
 public class MapEditor : MonoBehaviour
 {
     [Header("Misc")]
@@ -19,8 +22,8 @@ public class MapEditor : MonoBehaviour
     private Vector2Int mapSize;
     private Biomes biomeType;
     private Difficulty difficulty;
-    private string mapName;
-    private string mapPath;
+    private string mapName = "";
+    private string mapPath = "";
 
     private Transform GridRoot => transform.GetChild(0);
     private Transform MapElementsRoot => transform.GetChild(1);
@@ -30,10 +33,24 @@ public class MapEditor : MonoBehaviour
     private bool isPlayer = false;
     private InputField3D nameField;
 
+    /// <summary>
+    /// Currently selected type of map element, that will be placed on grid.
+    /// </summary>
     public ElementType CurrentlySelectedElement { get; private set; } = ElementType.Ground;
+
+    /// <summary>
+    /// Indicates whether deleting mode is on.
+    /// </summary>
     public bool IsDeleting { get; private set; } = false;
 
+    /// <summary>
+    /// Indicates whether the map editor is opened.
+    /// </summary>
     public static bool IsEditor { get; private set; } = false;
+
+    /// <summary>
+    /// Returns path to folder that contains user's maps.
+    /// </summary>
     public static string PathToMapsDir => Path.Combine(Application.dataPath, "MyMaps");
 
     private void Start()
@@ -55,6 +72,10 @@ public class MapEditor : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Initializes new editor session with empty grid.
+    /// </summary>
+    /// <param name="gridSize">Size of grid.</param>
     public void InitializeEditor(Vector2Int gridSize)
     {
         ElementType[,] elements = new ElementType[gridSize.y, gridSize.x];
@@ -65,9 +86,17 @@ public class MapEditor : MonoBehaviour
                 elements[y, x] = ElementType.Air;
         }
 
-        InitializeEditor(new Map("new map", elements), mapPath);
+        InitializeEditor(elements, gridSize, biomeType, difficulty, mapPath);
     }
 
+    /// <summary>
+    /// Initializes new editor session and loads map with given size with elements from given 2D array.
+    /// </summary>
+    /// <param name="mapDefinition">Map elements</param>
+    /// <param name="mapSize">Size of map</param>
+    /// <param name="biomeType">Type of biome</param>
+    /// <param name="difficulty">Difficulty of map</param>
+    /// <param name="mapName">Name of map</param>
     public void InitializeEditor(ElementType[,] mapDefinition, Vector2Int mapSize, Biomes biomeType, Difficulty difficulty, string mapName)
     {
         if (!Directory.Exists(PathToMapsDir))
@@ -76,6 +105,7 @@ public class MapEditor : MonoBehaviour
         IsEditor = true;
         this.mapSize = mapSize;
         this.mapName = mapName;
+        this.biomeType = biomeType;
         nameField.SetValue(mapName);
 
         CameraSettings();
@@ -105,16 +135,24 @@ public class MapEditor : MonoBehaviour
 
         LevelManager.CurrentManager.SetBackgroundColor(biomeType);
         SelectElement(allButtons[2].GetComponent<Button3D>());
-        this.biomeType = biomeType;
         SetButtons();
     }
 
+    /// <summary>
+    /// Initializes new editor session, loads map and reads necessery informations from given <seealso cref="Map"/>.
+    /// </summary>
+    /// <param name="mapToLoad">Deserialized map to load informations from</param>
+    /// <param name="path">Path from which given map was loaded</param>
     public void InitializeEditor(Map mapToLoad, string path)
     {
         mapPath = path;
         InitializeEditor(mapToLoad.mapDefinition, mapToLoad.mapSize, mapToLoad.biomeType, mapToLoad.difficulty, mapToLoad.name);
     }
 
+    /// <summary>
+    /// Change size of current grid.
+    /// </summary>
+    /// <param name="newSize"></param>
     private void ResizeGrid(Vector2Int newSize)
     {
         ClearElements();
@@ -150,6 +188,10 @@ public class MapEditor : MonoBehaviour
         InitializeEditor(elements, newSize, biomeType, Difficulty.Easy, mapName);
     }
 
+    /// <summary>
+    /// Creates new grid with given size.
+    /// </summary>
+    /// <param name="gridSize">Size of new grid.</param>
     private void CreateGrid(Vector2Int gridSize)
     {
         grid = new GameObject[gridSize.y, gridSize.x];
@@ -167,6 +209,9 @@ public class MapEditor : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Removes all grid panels.
+    /// </summary>
     private void ClearGrid()
     {
         if (!IsEditor) return;
@@ -179,7 +224,10 @@ public class MapEditor : MonoBehaviour
             }
         }
     }
-
+    
+    /// <summary>
+    /// Removes all previously created map elements.
+    /// </summary>
     private void ClearElements()
     {
         for (int y = 0; y < mapSize.y; y++)
@@ -196,6 +244,9 @@ public class MapEditor : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Returns back to menu, note that it doesn't save map.
+    /// </summary>
     public void BackToMenu()
     {
         editorUI.SetBool("show", false);
@@ -218,6 +269,9 @@ public class MapEditor : MonoBehaviour
         cam.GetComponent<MapEditorCamera>().DeactivateController();
     }
 
+    /// <summary>
+    /// Saves map to xml file. Gets name from 3D input field.
+    /// </summary>
     public void SaveMap()
     {
         if(mapName.Length == 0 || mapName.IndexOfAny(Path.GetInvalidFileNameChars()) != -1)
@@ -236,6 +290,8 @@ public class MapEditor : MonoBehaviour
             mapSerializer.Serialize(map);
             msg.SetText($"Saved map correctly in: {mapPath}", 6f, Color.green);
 
+            MakeMapMiniature();
+
             RankingManager.RemoveAllRecords(map.name);
             SaveLoadManager.ClearSave(map);
         }
@@ -245,6 +301,10 @@ public class MapEditor : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Selects element to paint.
+    /// </summary>
+    /// <param name="sender">Button that sent this request. It is used to get name of element.</param>
     public void SelectElement(MonoBehaviour sender)
     {
         foreach (GameObject btn in allButtons)
@@ -266,11 +326,20 @@ public class MapEditor : MonoBehaviour
         SelectElement(elementType);
     }
 
+    /// <summary>
+    /// Selects element to paint.
+    /// </summary>
     public void SelectElement(ElementType elementType) => CurrentlySelectedElement = elementType;
 
+    /// <summary>
+    /// Creates currently selected element at given position, replaces it or remove it if IsDeleting is true.
+    /// </summary>
+    /// <param name="pos">Position on which element will be modified.</param>
     public void PlaceElement(Vector3 pos)
     {
-        if(isPlayer && (CurrentlySelectedElement == ElementType.Player || CurrentlySelectedElement == ElementType.PlayerOnTarget) && !IsDeleting)
+        Collider[] colliders = new Collider[0];
+
+        if (isPlayer && (CurrentlySelectedElement == ElementType.Player || CurrentlySelectedElement == ElementType.PlayerOnTarget) && !IsDeleting)
         {
             msg.SetText("Cannot place more than one player element!", 4f, Color.red);
             return;
@@ -315,28 +384,33 @@ public class MapEditor : MonoBehaviour
             Destroy(newElem.GetComponent<Collider>());
         }
 
+        if (newElem != null)
+        {
+            colliders = newElem.GetComponentsInChildren<Collider>();
+            foreach (Collider c in colliders)
+                Destroy(c);
+            colliders = new Collider[0];
+        }
+
         if (CurrentlySelectedElement == ElementType.DoneTarget || CurrentlySelectedElement == ElementType.PlayerOnTarget)
         {
             newElem = 
                 Instantiate(MapElementsManager.CurrentManager.GetMapElement(ElementType.Target, biomeType), new Vector3(pos.x, 0f, pos.z), Quaternion.identity, MapElementsRoot);
             elements[Mathf.Abs((int)pos.z), Mathf.Abs((int)pos.x)].Add(newElem);
-            Destroy(newElem.GetComponent<Collider>());
         }
 
         if (newElem != null)
-            Destroy(newElem.GetComponent<Collider>());
+        {
+            colliders = newElem.GetComponentsInChildren<Collider>();
+            foreach (Collider c in colliders)
+                Destroy(c);
+            colliders = new Collider[0];
+        }
 
         newElem = Instantiate(MapElementsManager.CurrentManager.GetMapElement(CurrentlySelectedElement, biomeType), new Vector3(pos.x, yPos, pos.z), Quaternion.identity, MapElementsRoot);
 
-        if(CurrentlySelectedElement == ElementType.PlayerOnTarget)
-        {
-            Color c = newElem.GetComponent<Renderer>().material.color;
-            newElem.GetComponent<Renderer>().material.color = new Color(c.r, c.g, c.b, 0.825f);
-        }
-
         if(CurrentlySelectedElement == ElementType.DoneTarget)
         {
-            print(newElem.name);
             newElem.transform.GetChild(1).localScale = Vector3.one * 0.8f;
             newElem.GetComponent<Box>().EnterTarget();
         }
@@ -344,12 +418,17 @@ public class MapEditor : MonoBehaviour
         elements[Mathf.Abs((int)pos.z), Mathf.Abs((int)pos.x)].Add(newElem);
         elementTypes[Mathf.Abs((int)pos.z), Mathf.Abs((int)pos.x)] = CurrentlySelectedElement;
 
-        Destroy(newElem.GetComponent<Collider>());
+        colliders = newElem.GetComponentsInChildren<Collider>();
+        foreach (Collider c in colliders)
+            Destroy(c);
 
         if (CurrentlySelectedElement == ElementType.Player || CurrentlySelectedElement == ElementType.PlayerOnTarget)
             isPlayer = true;
     }
 
+    /// <summary>
+    /// Sets start camera position and rotation.
+    /// </summary>
     private void CameraSettings()
     {
         int max = mapSize.x > mapSize.y ? mapSize.x : mapSize.y;
@@ -359,9 +438,25 @@ public class MapEditor : MonoBehaviour
         cam.GetComponent<MapEditorCamera>().ActivateController(mapSize);
     }
 
+    /// <summary>
+    /// Makes screenshot of current map and save it to JPG file.
+    /// </summary>
+    private void MakeMapMiniature()
+    {
+        CameraSettings();
+
+        cam.transform.GetChild(0).GetComponent<Camera>().enabled = false;
+        Screenshotter.TakeScreenshot(Screenshotter.GetMapIconPath(mapPath), cam);
+        cam.transform.GetChild(0).GetComponent<Camera>().enabled = true;
+    }
+
+    /// <summary>
+    /// Returns array that contains paths to all created maps which are in MyMaps directory.
+    /// </summary>
+    /// <returns></returns>
     public static string[] GetAllMapsPaths()
     {
-        if (!Directory.Exists(PathToMapsDir)) return null;
+        if (!Directory.Exists(PathToMapsDir)) return new string[0];
 
         string[] allFiles = Directory.GetFiles(PathToMapsDir);
         List<string> xmlFiles = new List<string>();
@@ -375,6 +470,11 @@ public class MapEditor : MonoBehaviour
         return xmlFiles.ToArray();
     }
 
+    /// <summary>
+    /// Removes all elements at given position.
+    /// </summary>
+    /// <param name="x">X coordinate</param>
+    /// <param name="y">Y coordinate</param>
     private void RemoveAllElementsFromList(int x, int y)
     {
         if (elementTypes[y, x] == ElementType.Player || elementTypes[y, x] == ElementType.PlayerOnTarget)
@@ -390,6 +490,9 @@ public class MapEditor : MonoBehaviour
         elements[y, x].Clear();
     }
 
+    /// <summary>
+    /// Gets next biome from <seealso cref="Biomes"/> enum and sets is as current.
+    /// </summary>
     public void SwitchBiome()
     {
         Biomes[] arr = (Biomes[])System.Enum.GetValues(typeof(Biomes));
@@ -400,6 +503,9 @@ public class MapEditor : MonoBehaviour
         ResizeGrid(mapSize);
     }
 
+    /// <summary>
+    /// Activates buttons that fit to current biome, and deactivates rest of buttons.
+    /// </summary>
     private void SetButtons()
     {
         foreach (GameObject go in buttonsRoots)
@@ -433,6 +539,10 @@ public class MapEditor : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Calls when 3D input field value has been modified.
+    /// </summary>
+    /// <param name="sender"><seealso cref="MonoBehaviour"/> that raises this callback.</param>
     public void InputFieldChanged(MonoBehaviour sender) => mapName = nameField.value;
 
     #region Resize grid buttons
