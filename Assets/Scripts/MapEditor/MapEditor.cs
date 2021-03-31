@@ -445,9 +445,22 @@ public class MapEditor : MonoBehaviour
     {
         CameraSettings();
 
+        
+        for(int y = 0; y < mapSize.y; y++)
+        {
+            for (int x = 0; x < mapSize.x; x++)
+                grid[y, x].SetActive(false);
+        }
+
         cam.transform.GetChild(0).GetComponent<Camera>().enabled = false;
         Screenshotter.TakeScreenshot(Screenshotter.GetMapIconPath(mapPath), cam);
         cam.transform.GetChild(0).GetComponent<Camera>().enabled = true;
+
+        for (int y = 0; y < mapSize.y; y++)
+        {
+            for (int x = 0; x < mapSize.x; x++)
+                grid[y, x].SetActive(true);
+        }
     }
 
     /// <summary>
