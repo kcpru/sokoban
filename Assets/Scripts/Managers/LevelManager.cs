@@ -117,6 +117,9 @@ public class LevelManager : MonoBehaviour
                 cam.transform.rotation = Quaternion.identity;
 
                 CurrentMovesCount = 0;
+
+                yield return new WaitForSeconds(0.1f);
+                SoundsManager.Manager.WinSound.Play();
             }
         }
         else

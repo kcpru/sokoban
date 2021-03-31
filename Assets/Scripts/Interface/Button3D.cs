@@ -43,6 +43,7 @@ public class Button3D : MonoBehaviour
     {
         if(click && isMouseOver)
         {
+            SoundsManager.Manager.ClickSound.Play();
             OnClick.Invoke(this);
         }
     }

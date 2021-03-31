@@ -244,12 +244,14 @@ public class MapManager : MonoBehaviour
                 if(GetElementType(newPos) == ElementType.DoneTarget)
                 {
                     Debug.Log("<color=red>EXIT TARGET</color>");
+                    SoundsManager.Manager.ExitTargetSound.Play();
                     currentElements[newPos.y, newPos.x].GetComponent<Box>().ExitTarget();
                 }
 
                 if (GetElementType(newBoxPos) == ElementType.Target)
                 {
                     Debug.Log("<color=green>ENTER TARGET</color>");
+                    SoundsManager.Manager.EnterTargetSound.Play();
                     currentElements[newPos.y, newPos.x].GetComponent<Box>().EnterTarget();
                 }
 
