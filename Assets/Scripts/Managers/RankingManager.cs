@@ -1,4 +1,3 @@
-using UnityEngine;
 using System.IO;
 using System.Xml;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ using System;
 /// </summary>
 public static class RankingManager
 {
-    public static string PathToRankFile => Path.Combine(Application.dataPath, "Save/Ranking.xml");
+    public static string PathToRankFile => Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "Sokoban/Save/Ranking.xml");
     public const int MAX_RECORDS = 20;
 
     /// <summary>

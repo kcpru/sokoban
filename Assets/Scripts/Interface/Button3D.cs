@@ -26,7 +26,7 @@ public class Button3D : MonoBehaviour
     private void OnMouseEnter()
     {
         isMouseOver = true;
-        targetScale = startScale * scaleMultiplier;
+        targetScale = isClickable ? startScale * scaleMultiplier : startScale;
     }
 
     private void OnMouseExit()

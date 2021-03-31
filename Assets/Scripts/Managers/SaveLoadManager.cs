@@ -1,10 +1,9 @@
 using System.Xml;
 using System.IO;
-using UnityEngine;
 
 public static class SaveLoadManager
 {
-    public static string PathToSaveFiles => Path.Combine(Application.dataPath, "Save");
+    public static string PathToSaveFiles => Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "Sokoban/Save");
 
     public static void SaveLevelProgress(Map mapToSave, int movesCount)
     {

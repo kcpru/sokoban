@@ -51,7 +51,7 @@ public class MapEditor : MonoBehaviour
     /// <summary>
     /// Returns path to folder that contains user's maps.
     /// </summary>
-    public static string PathToMapsDir => Path.Combine(Application.dataPath, "MyMaps");
+    public static string PathToMapsDir => Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "Sokoban/MyMaps");
 
     private void Start()
     {
