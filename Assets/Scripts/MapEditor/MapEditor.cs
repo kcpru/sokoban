@@ -28,7 +28,6 @@ public class MapEditor : MonoBehaviour
     private Transform GridRoot => transform.GetChild(0);
     private Transform MapElementsRoot => transform.GetChild(1);
 
-    private GameObject[] allButtons;
     private GameObject[] buttonsRoots;
     private bool isPlayer = false;
     private InputField3D nameField;
@@ -55,21 +54,13 @@ public class MapEditor : MonoBehaviour
 
     private void Start()
     {
-        allButtons = new GameObject[editorUI.transform.GetChild(0).GetChild(0).childCount * 5];
         buttonsRoots = new GameObject[5];
         nameField = editorUI.transform.GetChild(0).GetChild(13).GetComponent<InputField3D>();
         nameField.OnValueChanged.AddListener(InputFieldChanged);
         int index = 0;
 
         for (int j = 0; j < 5; j++)
-        {
             buttonsRoots[j] = editorUI.transform.GetChild(0).GetChild(j).gameObject;
-            for (int i = 0; i < allButtons.Length / 5; i++)
-            {
-                allButtons[index] = editorUI.transform.GetChild(0).GetChild(j).GetChild(i).gameObject;
-                index++;
-            }
-        }
     }
 
     /// <summary>
@@ -134,7 +125,7 @@ public class MapEditor : MonoBehaviour
         }
 
         LevelManager.CurrentManager.SetBackgroundColor(biomeType);
-        SelectElement(allButtons[2].GetComponent<Button3D>());
+        SelectElement(ElementType.Ground);
         SetButtons();
     }
 
@@ -308,11 +299,6 @@ public class MapEditor : MonoBehaviour
     /// <param name="sender">Button that sent this request. It is used to get name of element.</param>
     public void SelectElement(MonoBehaviour sender)
     {
-        foreach (GameObject btn in allButtons)
-            btn.transform.localScale = Vector3.one;
-
-        sender.transform.localScale = sender.transform.localScale * 1.2f;
-
         if (sender.name == "Delete")
         {
             IsDeleting = true;

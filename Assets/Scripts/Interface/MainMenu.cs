@@ -217,7 +217,7 @@ public class MainMenu : MonoBehaviour
                     text.text += $"Points: <b>{r.points.ToString()} | </b>Count of moves: <b>{r.moves.ToString()}</b> | Date: <b>{r.date.ToShortDateString()} {r.date.ToShortTimeString()}</b>\n";
                 }
 
-                SetMapIcon(path);
+                SetMapIcon(path, module2Info.transform.GetChild(0).gameObject);
                 
                 Button3D playBtn = module2Info.transform.GetChild(4).GetComponent<Button3D>();
                 Button3D playSavedBtn = module2Info.transform.GetChild(5).GetComponent<Button3D>();
@@ -318,6 +318,19 @@ public class MainMenu : MonoBehaviour
 
                 Button3D btn = obj.GetComponent<Button3D>();
 
+                string iconPath = $"Maps/{Path.GetFileNameWithoutExtension($"{obj.name}_icon.jpg")}";
+
+                MeshRenderer renderer = obj.GetComponent<MeshRenderer>();
+                Material mat = new Material(Shader.Find("Legacy Shaders/Diffuse"));
+                Texture2D texture = Resources.Load<Texture2D>(iconPath);
+                print(iconPath);
+
+                if (texture != null)
+                {
+                    mat.mainTexture = texture;
+                    renderer.material = mat;
+                }
+
                 btn.OnClick.AddListener((sender) =>
                 {
                     MapSerializer serializer = new MapSerializer(MapSerializer.MapsPath + "/" + sender.name);
@@ -332,7 +345,7 @@ public class MainMenu : MonoBehaviour
                     TextMeshPro text = module2Info.transform.GetChild(2).GetComponent<TextMeshPro>();
                     text.text = "";
 
-                    SetMapIcon(MapSerializer.MapsPath + "/" + sender.name + ".xml");
+                    SetMapIcon(MapSerializer.MapsPath + "/" + sender.name + ".xml", module2Info.transform.GetChild(0).gameObject);
 
                     foreach (RankingManager.Record r in records)
                     {
@@ -454,11 +467,10 @@ public class MainMenu : MonoBehaviour
         }
     }
 
-    private void SetMapIcon(string path)
+    private void SetMapIcon(string path, GameObject display)
     {
         string iconPath = Screenshotter.GetMapIconPath(path);
 
-        GameObject display = module2Info.transform.GetChild(0).gameObject;
         MeshRenderer renderer = display.GetComponent<MeshRenderer>();
         Material mat = new Material(Shader.Find("Legacy Shaders/Diffuse"));
 

@@ -14,8 +14,8 @@ public class Button3D : MonoBehaviour
     private bool isMouseOver = false;
     private bool click = false;
 
-    private Vector3 startScale;
-    private Vector3 targetScale;
+    [HideInInspector] public Vector3 startScale;
+    [HideInInspector] public Vector3 targetScale;
 
     private void Start()
     {
@@ -44,6 +44,7 @@ public class Button3D : MonoBehaviour
         if(click && isMouseOver)
         {
             SoundsManager.Manager.ClickSound.Play();
+            targetScale = startScale;
             OnClick.Invoke(this);
         }
     }
