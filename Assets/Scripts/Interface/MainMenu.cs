@@ -17,6 +17,7 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private GameObject credits;
     [SerializeField] private GameObject module2Levels;
     [SerializeField] private GameObject module2Info;
+    [SerializeField] private Splashes splashes;
 
     [Header("Module 2")]
     [SerializeField] private GameObject module2MapButton;
@@ -82,6 +83,7 @@ public class MainMenu : MonoBehaviour
             case 0:
                 camAnim.SetInteger("view", MAIN_MENU);
                 camAnim.SetTrigger("switch");
+                splashes.RandomSplash();
                 break;
             case 1:
                 camAnim.SetInteger("view", BOTTOM_1);
